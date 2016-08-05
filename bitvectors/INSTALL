@@ -1,0 +1,45 @@
+bitvectors
+==========
+
+Here we provide an installation guide for all supported platforms.
+
+
+1) Linux (tested on Ubuntu and Debian)
+--------------------------------------
+First install the following software dependencies:
+    - g++
+    - git (with its SVN extension)
+    - cmake
+
+If you are in hurry, type the following commands in a terminal:
+
+    $ git svn clone https://svn.labri.fr/repos/rebours ./
+    $ cd rebours/bitvectors/
+    $ mkdir ./build
+    $ cd ./build
+    $ cmake ..
+    $ make install
+
+If you want to know more about the compilation options:
+    $ cmake ..
+            -DCMAKE_BUILD_TYPE=<Release*|Debug>
+            -DBITVECTORS_BUILD_TOOLS=<yes*|no>
+            -DBITVECTORS_BUILD_TESTS=<yes|no*>
+            -DZ3_ROOT=<install-dir-of-Z3-solver>
+            -DBOOLECTOR_ROOT=<install-dir-of-Boolector-solver>
+            -DMATHSAT5_ROOT=<install-dir-of-MathSAT5-solver>
+
+Where '<flag0*|flag1|flag2>' is a choice of flags with 'flag0' is the
+default choice when the variable is not triggered through the cmake
+'-D' option.
+
+All built binaries can be found in the directory:
+
+    ./build/../bin/Linux_${CMAKE_BUILD_TYPE}/lib
+
+
+2) MS-Windows 7+
+----------------
+
+TODO
+

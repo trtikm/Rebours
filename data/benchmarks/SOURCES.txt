@@ -1,0 +1,21 @@
+./src/loadlibs
+    - source code of all binaries: ./bin/loadlibs_*
+    - origin: Marek
+    - cathegory: Regular SW.
+    - chalenges: Loading.
+
+./bin/crackme_*
+    - origin: Emmanuel
+    - cathegory: Self-rewriting.
+    - chalenges: Loading, CFG-recovery.
+
+./bin/tiny*
+    - origin: Emmanuel
+    - cathegory: Regular SW.
+    - chalenges: Loading.
+
+./bin/malwaredb.malekal.com/linux/*
+    - origin: malwaredb.malekal.com
+    - cathegory: Malware
+    - chalenges: Loading, CFG-recovery.
+

@@ -1,0 +1,44 @@
+loader
+======
+
+Here is an installation guide for all supported platforms.
+
+
+Linux (tested on Ubuntu and Debian)
+-----------------------------------
+First install the following software dependencies:
+    - g++
+    - git (with its SVN extension)
+    - cmake
+
+If you are in hurry, type the following commands in a terminal:
+
+    $ git svn clone https://svn.labri.fr/repos/rebours ./
+    $ cd rebours/MAL/loader/
+    $ mkdir ./build
+    $ cd ./build
+    $ cmake ../
+    $ make install
+
+If you want to know more about the compilation options:
+    $ cmake ../
+            -DCMAKE_BUILD_TYPE=<Release*|Debug>
+            -DTESTS=<yes|no*>
+            -DTESTS_DATA_PATH=<data-path>
+
+Where '<flag0*|flag1|flag2>' is a choice of flags with 'flag0' is the
+default choice when the variable is not triggered through the cmake
+'-D' option.
+
+And, '<data-path>' is the directory, where tests of the loader project
+will look for data files. It is the installation directory of loader's
+database of benchmarks. You typically install the database to:
+<rebours-install-dir>/data
+
+Note that this directory is necessary only when you set
+'-DTESTS=yes'.
+    
+All built binaries can be found in the directory:
+
+    ./build/../bin/Linux_${CMAKE_BUILD_TYPE}/lib/MAL
+
