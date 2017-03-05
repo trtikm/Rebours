@@ -1,0 +1,5 @@
+utility
+=======
+
+The module provides general purpose algorithms and data structures
+for other modules of Rebours project.

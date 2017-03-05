@@ -1,8 +1,14 @@
-#include <rebours/MAL/loader/buffer_io.hpp>
-#include <rebours/MAL/loader/endian.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/buffer_io.hpp>
+#include <rebours/utility/endian.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/config.hpp>
 #include <algorithm>
+
+#if COMPILER() == COMPILER_VC()
+//#   pragma(disable,warning,4996)
+#endif
+
 
 namespace {
 
@@ -98,9 +104,9 @@ int64_t  buffer_to_int64_t(uint8_t const* const  buffer_begin,
     return buffer_to_number<int64_t>(buffer_begin,buffer_end,is_it_big_endian_buffer);
 }
 
-void  address_to_buffer(loader::address const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer)
+void  address_to_buffer(uint64_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer)
 {
-    number_to_buffer<loader::address>(value,buffer,use_big_endian_buffer);
+    number_to_buffer<uint64_t>(value,buffer,use_big_endian_buffer);
 }
 
 void  uint16_t_to_buffer(uint16_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer)

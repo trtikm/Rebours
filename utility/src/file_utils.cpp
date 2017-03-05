@@ -1,18 +1,23 @@
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/buffer_io.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/buffer_io.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
+#include <rebours/utility/config.hpp>
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
 #include <sstream>
-#if defined(WIN32)
+#include <vector>
+
+#if defined(WIN32) //|| COMPILER() == COMPILER_VC()
 #   include <windows.h>
 #elif defined(__linux__) || defined(__APPLE__)
 #   include <sys/stat.h>
+#   include <glob.h>
 #endif
 
-namespace {
+namespace fileutl { namespace {
 
 
 std::string::size_type  parse_last_dir_pos(std::string const&  file_pathname)
@@ -32,8 +37,9 @@ std::string::size_type  parse_last_dir_pos(std::string const&  file_pathname)
 }
 
 
-}
+}}
 
+namespace fileutl {
 
 
 bool  file_exists(std::string const&  pathname)
@@ -44,18 +50,20 @@ bool  file_exists(std::string const&  pathname)
 
 bool  is_directory(std::string const&  pathname)
 {
-    if (!file_exists(pathname))
-        return false;
-#   if defined(WIN32)
-    return PathIsDirectory(pathname.c_str());
-#   elif defined(__linux__) || defined(__APPLE__)
-    struct stat buf;
-    stat(pathname.c_str(), &buf);
-    return S_ISDIR(buf.st_mode);
-    //return S_ISREG(buf.st_mode); // is file ?
-#   else
-#       error "Unsuported platform."
-#   endif
+    NOT_IMPLEMENTED_YET();
+
+//    if (!file_exists(pathname))
+//        return false;
+//#   if defined(WIN32)
+//    return PathIsDirectory(pathname.c_str());
+//#   elif defined(__linux__) || defined(__APPLE__)
+//    struct stat buf;
+//    stat(pathname.c_str(), &buf);
+//    return S_ISDIR(buf.st_mode);
+//    //return S_ISREG(buf.st_mode); // is file ?
+//#   else
+//#       error "Unsuported platform."
+//#   endif
 }
 
 uint64_t  file_size(std::string const&  file_pathname)
@@ -77,6 +85,11 @@ std::string  parse_path_in_pathname(std::string const&  file_pathname)
     return file_pathname.substr(0U,parse_last_dir_pos(file_pathname));
 }
 
+std::string  remove_extension(std::string const&  filename)
+{
+    return filename.substr(0U,filename.find_last_of('.'));
+}
+
 void  create_directory(std::string const&  pathname)
 {
 #   if defined(WIN32)
@@ -91,15 +104,20 @@ void  create_directory(std::string const&  pathname)
 
 std::string  concatenate_file_paths(std::string const&  left_path, std::string const&  right_path)
 {
+    if (left_path.empty())
+        return right_path;
+    if (right_path.empty())
+        return left_path;
     return left_path + "/" + right_path;
 }
 
 std::string  absolute_path(std::string const&  path)
 {
-    // TODO: portability - this implementation won't probably work on Windows...
-    ASSUMPTION(file_exists(path));
-    std::vector<char> buffer(10000,0);
-    return realpath(path.c_str(),&buffer.at(0));
+    NOT_IMPLEMENTED_YET();
+//    // TODO: portability - this implementation won't probably work on Windows...
+//    ASSUMPTION(file_exists(path));
+//    std::vector<char> buffer(10000,0);
+//    return realpath(path.c_str(),&buffer.at(0));
 }
 
 std::string  normalise_path(std::string const&  path)
@@ -143,7 +161,7 @@ std::string  get_common_preffix(std::string const&  pathname1, std::string const
     split_pathname(pathname2,split2);
 
     std::vector<std::string>  common_split;
-    for (uint64_t  i = 0ULL, size = std::min(split1.size(),split2.size());
+    for (uint64_t  i = 0ULL, size = (split1.size() <= split2.size() ? split1.size() : split2.size());
          i < size && split1.at(i) == split2.at(i);
          ++i)
         common_split.push_back(split1.at(i));
@@ -172,6 +190,22 @@ std::string  get_relative_path(std::string const&  pathname, std::string const& 
     std::string const  result = join_path_parts(split1);
     return result;
 }
+
+void  enumerate_files_by_pattern(const std::string&  pattern, std::vector<std::string>&  output_pathnames)
+{
+    NOT_IMPLEMENTED_YET();
+//    ::glob_t glob_result;
+//    ::glob(pattern.c_str(),GLOB_TILDE,NULL,&glob_result);
+//    for(unsigned int i = 0U; i < glob_result.gl_pathc; ++i)
+//        output_pathnames.push_back(glob_result.gl_pathv[i]);
+//    globfree(&glob_result);
+}
+
+bool  delete_file(const std::string&  pathname)
+{
+    return std::remove(pathname.c_str()) != 0;
+}
+
 
 void  skip_bytes(std::ifstream&  stream, uint64_t const count)
 {
@@ -264,4 +298,7 @@ int64_t  read_bytes_to_int64_t(std::ifstream&  stream, uint8_t const  num_bytes,
     char buffer[sizeof(int64_t)];
     stream.read(buffer,num_bytes);
     return buffer_to_int64_t(buffer,buffer + num_bytes, is_in_big_endian);
+}
+
+
 }

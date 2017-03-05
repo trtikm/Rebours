@@ -1,7 +1,7 @@
 #ifndef DIGRAPH_HPP_INCLUDED
 #   define DIGRAPH_HPP_INCLUDED
 
-#   include <rebours/program/assumptions.hpp>
+#   include <rebours/utility/assumptions.hpp>
 #   include <unordered_map>
 #   include <unordered_set>
 #   include <vector>

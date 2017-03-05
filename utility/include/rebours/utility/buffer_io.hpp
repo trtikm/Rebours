@@ -1,7 +1,6 @@
 #ifndef IOBUFFER_HPP
-#define IOBUFFER_HPP
+#   define IOBUFFER_HPP
 
-#   include <rebours/MAL/loader/address.hpp>
 #   include <cstdint>
 #   include <vector>
 
@@ -10,7 +9,7 @@
  * Each function converts the memory into a differnt type of number.
  */
 
-void  address_to_buffer(loader::address const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer);
+void  address_to_buffer(uint64_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer);
 void  uint16_t_to_buffer(uint16_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer);
 void  uint32_t_to_buffer(uint32_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer);
 void  uint64_t_to_buffer(uint64_t const  value, std::vector<uint8_t>&  buffer, bool const  use_big_endian_buffer);

@@ -1,5 +1,5 @@
-#include <rebours/bitvectors/detail/unique_handles.hpp>
-#include <rebours/bitvectors/invariants.hpp>
+#include <rebours/utility/unique_handle.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <mutex>
 #include <set>
 
