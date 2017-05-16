@@ -84,10 +84,6 @@ analysis/native_execution/include/rebours/analysis/.idea
 analysis/native_execution/include/rebours/analysis/native_execution/.idea
 analysis/native_execution/src/.idea
 analysis/native_execution/temp
-utility/*.user
-utility/.idea
-utility/bin
-utility/build
 /bin
 bitvectors/*.user
 bitvectors/.idea
