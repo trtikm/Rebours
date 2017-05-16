@@ -27,6 +27,7 @@ if (APPLE)
 elseif(UNIX)
   message("Operating System = Unix")
 elseif(WIN32)
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
   message("Operating System = MS-Windows")
 else()
   message(FATAL_ERROR "Unsupported Operating System ! Aborting...

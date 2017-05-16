@@ -5,11 +5,6 @@
 #include <rebours/utility/config.hpp>
 #include <algorithm>
 
-#if COMPILER() == COMPILER_VC()
-//#   pragma(disable,warning,4996)
-#endif
-
-
 namespace {
 
 
