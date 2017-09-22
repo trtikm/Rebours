@@ -3,9 +3,6 @@
 
 #   include <cstdint>
 
-namespace bv { namespace detail {
-
-
 /**
  * Each instances of this type possesses a unique number. More precisely, it is
  * impossible for two different instances of this type to exist at the same time
@@ -28,7 +25,5 @@ private:
     uint32_t  m_id;
 };
 
-
-}}
 
 #endif

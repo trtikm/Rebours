@@ -28,11 +28,14 @@ Configuration is available through pre-defined macros:
 
 #   define PLATFORM_WINDOWS()     1
 #   define PLATFORM_LINUX()       2
+#   define PLATFORM_APPLE()       3
 
-#   if defined(WIN32)
+#   if defined(_WIN32)
 #       define PLATFORM()         PLATFORM_WINDOWS()
 #   elif defined(__linux__)
 #       define PLATFORM()         PLATFORM_LINUX()
+#   elif defined(__APPLE__)
+#       define PLATFORM()         PLATFORM_APPLE()
 #   else
 #       error "Unsuported platform."
 #   endif
@@ -66,12 +69,13 @@ Configuration is available through pre-defined macros:
 
 ////////////////////////////////////////////////////////////////////////////////
 
+#   define BUILD_TYPE_DEBUG()       1
+#   define BUILD_TYPE_RELEASE()     2
+
 #   if defined(_DEBUG) || defined(DEBUG)
-#       define BUILD_DEBUG()    1
-#       define BUILD_RELEASE()  0
+#       define BUILD_TYPE()     BUILD_TYPE_DEBUG()
 #   else
-#       define BUILD_DEBUG()    0
-#       define BUILD_RELEASE()  1
+#       define BUILD_TYPE()     BUILD_TYPE_RELEASE()
 #   endif
 
 #endif

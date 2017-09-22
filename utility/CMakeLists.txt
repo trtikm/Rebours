@@ -99,6 +99,15 @@ find_package(Threads)
 add_library(utility
     ./include/rebours/utility/config.hpp
 
+    ./include/rebours/utility/fail_message.hpp
+    ./src/fail_message.cpp
+
+    ./include/rebours/utility/timeprof.hpp
+    ./src/timeprof.cpp
+
+    ./include/rebours/utility/timestamp.hpp
+    ./src/timestamp.cpp
+
     ./include/rebours/utility/assumptions.hpp
     ./include/rebours/utility/invariants.hpp
 

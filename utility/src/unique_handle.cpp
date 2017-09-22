@@ -3,14 +3,12 @@
 #include <mutex>
 #include <set>
 
-namespace bv { namespace detail { namespace {
+namespace {
 
 std::mutex  mutex_for_handles;
 std::set<uint32_t>  handles;
 
-}}}
-
-namespace bv { namespace detail {
+}
 
 
 unique_handle::unique_handle()
@@ -28,6 +26,3 @@ unique_handle::~unique_handle()
     std::lock_guard<std::mutex> const  lock(mutex_for_handles);
     handles.erase(m_id);
 }
-
-
-}}
