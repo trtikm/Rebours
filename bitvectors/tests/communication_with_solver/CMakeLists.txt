@@ -6,6 +6,7 @@ add_executable(communication_with_solver
 
 target_link_libraries(communication_with_solver
     bitvectors
+    utility
     ${Z3_LIBRARIES_TO_LINK_WITH}
     ${CMAKE_THREAD_LIBS_INIT}
     )

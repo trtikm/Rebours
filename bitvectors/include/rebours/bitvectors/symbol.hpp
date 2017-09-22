@@ -1,8 +1,8 @@
 #ifndef REBOURS_BITVECTORS_SYMBOL_HPP_INCLUDED
 #   define REBOURS_BITVECTORS_SYMBOL_HPP_INCLUDED
 
-#   include <rebours/bitvectors/large_types.hpp>
-#   include <rebours/bitvectors/endian.hpp>
+#   include <rebours/utility/large_types.hpp>
+#   include <rebours/utility/endian.hpp>
 #   include <string>
 #   include <vector>
 #   include <cstdint>

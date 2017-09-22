@@ -1,9 +1,11 @@
 #include <rebours/bitvectors/detail/execute_shell_command_with_async_pipe.hpp>
+#include <rebours/utility/config.hpp>
 #include <memory>
 #include <cstdint>
-#   if defined(WIN32)
-#       error "NOT IMPLEMENTED YET!"
-#   elif defined(__linux__) || defined(__APPLE__)
+#include <iostream>
+#   if PLATFORM()==PLATFORM_WINDOWS()
+#       include <rebours/utility/development.hpp>
+#   elif PLATFORM()==PLATFORM_LINUX() || PLATFORM()==PLATFORM_APPLE()
 #       include <cstdio>
 #       include <signal.h>
 #       include <fcntl.h>
@@ -13,14 +15,21 @@
 #   else
 #       error "Unsuported platform."
 #   endif
-#include <iostream>
 
 namespace bv { namespace detail {
 
 
-#   if defined(WIN32)
-#       error "NOT IMPLEMENTED YET!"
-#   elif defined(__linux__) || defined(__APPLE__)
+#   if PLATFORM()==PLATFORM_WINDOWS()
+
+
+bool  execute_shell_command_with_async_pipe(std::string const& shell_command, std::function<bool()> const&  interrupt,
+                                            std::stringstream&  ostr)
+{
+    NOT_IMPLEMENTED_YET();
+}
+
+
+#   elif PLATFORM()==PLATFORM_LINUX() || PLATFORM()==PLATFORM_APPLE()
 
 //pid_t  popen2(char* const* command, int *infp, int *outfp)
 //{

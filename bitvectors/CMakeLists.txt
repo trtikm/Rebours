@@ -62,7 +62,7 @@ find_package(Threads)
 
 # Add Z3 SMT solver
 if(NOT DEFINED Z3_ROOT)
-    set(Z3_ROOT "" CACHE STRING "Specify Z3's install path" FORCE)
+    set(Z3_ROOT "Z3-NOTFOUND" CACHE STRING "Specify Z3's install path" FORCE)
 elseif(NOT (Z3_ROOT MATCHES ""))
     set(Z3_INCLUDE_DIRS ${Z3_ROOT}/include)
     if(EXISTS "${Z3_INCLUDE_DIRS}" AND IS_DIRECTORY "${Z3_INCLUDE_DIRS}")
@@ -96,7 +96,7 @@ endif()
 add_definitions("-DZ3_ROOT=${Z3_ROOT}")
 
 if(NOT DEFINED BOOLECTOR_ROOT)
-    set(BOOLECTOR_ROOT "" CACHE STRING "Specify Boolector's install path" FORCE)
+    set(BOOLECTOR_ROOT "BOOLECTOR-NOTFOUND" CACHE STRING "Specify Boolector's install path" FORCE)
     message(WARNING "WARNING: Installation directory of Boolector SMT solver was NOT specified!")
 elseif(NOT (BOOLECTOR_ROOT MATCHES ""))
     message("BOOLECTOR_ROOT = " ${BOOLECTOR_ROOT})
@@ -104,7 +104,7 @@ endif()
 add_definitions("-DBOOLECTOR_ROOT=${BOOLECTOR_ROOT}")
 
 if(NOT DEFINED MATHSAT5_ROOT)
-    set(MATHSAT5_ROOT "" CACHE STRING "Specify MathSAT5's install path" FORCE)
+    set(MATHSAT5_ROOT "MATHSAT5-NOTFOUND" CACHE STRING "Specify MathSAT5's install path" FORCE)
     message(WARNING "WARNING: Installation directory of MATHSAT5 SMT solver was NOT specified!")
 elseif(NOT (MATHSAT5_ROOT MATCHES ""))
     message("MATHSAT5_ROOT = " ${MATHSAT5_ROOT})
@@ -112,16 +112,16 @@ endif()
 add_definitions("-DMATHSAT5_ROOT=${MATHSAT5_ROOT}")
 
 
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 add_library(bitvectors
-    ./include/rebours/bitvectors/assumptions.hpp
-    ./include/rebours/bitvectors/invariants.hpp
-    ./include/rebours/bitvectors/endian.hpp
-    ./include/rebours/bitvectors/msgstream.hpp
-    ./include/rebours/bitvectors/test.hpp
-
-    ./include/rebours/bitvectors/large_types.hpp
-    ./src/large_types.cpp
-
     ./include/rebours/bitvectors/symbol.hpp
     ./src/symbol.cpp
 
@@ -141,14 +141,10 @@ add_library(bitvectors
     ./src/sat_engine_boolector/sat_engine_boolector.cpp
     ./src/sat_engine_mathsat5/sat_engine_mathsat5.cpp
 
-    ./include/rebours/bitvectors/detail/unique_handles.hpp
-    ./src/detail/unique_handles.cpp
     ./include/rebours/bitvectors/detail/execute_shell_command_with_async_pipe.hpp
     ./src/detail/execute_shell_command_with_async_pipe.cpp
     ./include/rebours/bitvectors/detail/sat_checking_interruption_function.hpp
     ./src/detail/sat_checking_interruption_function.cpp
-    ./include/rebours/bitvectors/detail/file_utils.hpp
-    ./src/detail/file_utils.cpp
     )
 
 

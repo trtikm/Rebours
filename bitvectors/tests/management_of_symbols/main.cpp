@@ -1,5 +1,5 @@
-#include <rebours/bitvectors/test.hpp>
 #include <rebours/bitvectors/symbol.hpp>
+#include <rebours/utility/test.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <fstream>

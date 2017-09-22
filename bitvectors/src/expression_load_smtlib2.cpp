@@ -1,7 +1,7 @@
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/bitvectors/expression_algo.hpp>
-#include <rebours/bitvectors/invariants.hpp>
-#include <rebours/bitvectors/msgstream.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
 #include <unordered_set>
 #include <unordered_map>
 #include <sstream>
@@ -463,8 +463,8 @@ expression  load_derived_expression(detail::smtlib2_token const&  token, std::ve
                                 << "Wrong parameters of '" << token.name() << "' operator.";
             return {};
         }
-        uint32_t  toadd = op_args.at(0ULL);
-        uint32_t  current = op_args.at(1ULL);
+        uint32_t  toadd = (uint32_t)op_args.at(0ULL);
+        uint32_t  current = (uint32_t)op_args.at(1ULL);
         expression  result = {make_symbol_of_interpreted_cast_unsigned_int(current,2U*current),args};
         while (true)
         {
@@ -488,7 +488,7 @@ expression  load_derived_expression(detail::smtlib2_token const&  token, std::ve
                                 << "Wrong parameters of '" << token.name() << "' operator.";
             return {};
         }
-        uint32_t  current = op_args.at(2ULL);
+        uint32_t  current = (uint32_t)op_args.at(2ULL);
         expression  result = {make_symbol_of_interpreted_cast_unsigned_int(current,current / 2U),args};
         while (true)
         {
@@ -545,7 +545,7 @@ void  tokenise_smtlib2_stream(std::istream&  istr, std::vector<smtlib2_token>&  
                 std::size_t const  cnt_n = std::count(new_line.cbegin(),new_line.cend(),'\n');
                 std::size_t const  cnt_r = std::count(new_line.cbegin(),new_line.cend(),'\r');
                 new_line.clear();
-                line += cnt_n == 0ULL ? cnt_r : cnt_n;
+                line += (uint32_t)(cnt_n == 0ULL ? cnt_r : cnt_n);
                 column = 1U;
             }
             static void  save_token_if_present(std::string&  token, uint32_t const  line, uint32_t const  column,

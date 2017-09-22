@@ -6,6 +6,7 @@ add_executable(expressions_io
 
 target_link_libraries(expressions_io
     bitvectors
+    utility
     )
 
 install(TARGETS expressions_io

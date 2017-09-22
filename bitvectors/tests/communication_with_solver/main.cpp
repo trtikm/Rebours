@@ -1,7 +1,7 @@
-#include <rebours/bitvectors/test.hpp>
 #include <rebours/bitvectors/expression.hpp>
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/bitvectors/sat_checking.hpp>
+#include <rebours/utility/test.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <sstream>

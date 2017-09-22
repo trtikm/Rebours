@@ -1,6 +1,6 @@
 #include <rebours/bitvectors/symbol.hpp>
-#include <rebours/bitvectors/assumptions.hpp>
-#include <rebours/bitvectors/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <sstream>
 #include <algorithm>
 #include <functional>
@@ -172,7 +172,7 @@ symbol  make_symbol_of_interpreted_constant(std::string const&  values_of_bytes_
     ASSUMPTION(
             [](std::string const&  s) {
                 for (auto c : s)
-                    if (!std::isxdigit(c) || c != ::tolower(c))
+                    if (!::isxdigit(c) || c != ::tolower(c))
                         return false;
                 return true;
                 }(values_of_bytes_in_hexadecimal_format));
@@ -190,7 +190,7 @@ symbol  make_symbol_of_interpreted_constant(uint8_t const*  begin, uint8_t const
     {
         uint8_t const*  b = revert_bytes_order ? end - 1ULL : begin;
         uint8_t const* const  e = revert_bytes_order ? begin - 1ULL : end;
-        int64_t const  s = revert_bytes_order ? -1ULL : 1ULL;
+        int64_t const  s = revert_bytes_order ? -1LL : 1LL;
         for ( ; b != e; b += s)
         {
             std::ostringstream  ostr;

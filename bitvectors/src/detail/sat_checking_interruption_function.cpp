@@ -3,11 +3,11 @@
 namespace bv { namespace detail { namespace {
 
 
-bool  sat_checking_interruption_function(std::chrono::system_clock::time_point const  start_time,
+bool  sat_checking_interruption_function(std::chrono::high_resolution_clock::time_point const  start_time,
                                          uint32_t const timeout_in_milliseconds,
                                          sat_result const&  output,  std::mutex& output_mutex)
 {
-    std::chrono::system_clock::time_point const  current_time = std::chrono::high_resolution_clock::now();
+    std::chrono::high_resolution_clock::time_point const  current_time = std::chrono::high_resolution_clock::now();
     double const duration = std::chrono::duration<double, std::milli>(current_time - start_time).count();
     if (duration >= double(timeout_in_milliseconds))
         return true;

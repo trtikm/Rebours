@@ -1,7 +1,7 @@
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/bitvectors/expression_algo.hpp>
-#include <rebours/bitvectors/invariants.hpp>
-#include <rebours/bitvectors/msgstream.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
 #include <unordered_set>
 #include <unordered_map>
 #include <sstream>

@@ -6,6 +6,7 @@ add_executable(management_of_symbols
 
 target_link_libraries(management_of_symbols
     bitvectors
+    utility
     )
 
 install(TARGETS management_of_symbols

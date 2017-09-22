@@ -2,7 +2,7 @@
 #   define REBOURS_BITVECTORS_EXPRESSION_IO_HPP_INCLUDED
 
 #   include <rebours/bitvectors/expression.hpp>
-#   include <rebours/bitvectors/assumptions.hpp>
+#   include <rebours/utility/assumptions.hpp>
 #   include <unordered_map>
 #   include <iosfwd>
 #   include <string>

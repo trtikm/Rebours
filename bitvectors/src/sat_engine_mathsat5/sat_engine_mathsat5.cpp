@@ -2,14 +2,15 @@
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/bitvectors/detail/execute_shell_command_with_async_pipe.hpp>
 #include <rebours/bitvectors/detail/sat_checking_interruption_function.hpp>
-#include <rebours/bitvectors/detail/unique_handles.hpp>
-#include <rebours/bitvectors/detail/file_utils.hpp>
-#include <rebours/bitvectors/endian.hpp>
+#include <rebours/utility/unique_handle.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/endian.hpp>
 #include <mutex>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <cctype>
 
 #define XSTR(s) STR(s)
 #define STR(s) #s
@@ -27,9 +28,9 @@ struct temp_files_clean_up
     ~temp_files_clean_up()
     {
         std::vector<std::string>  pathnames;
-        enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
+        fileutl::enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
         for (auto const& p : pathnames)
-            delete_file(p);
+            fileutl::delete_file(p);
     }
 } instance;
 
@@ -115,15 +116,15 @@ expression  parse_model_value(detail::smtlib2_ast_node const&  ast)
         return {};
     }
 
-    int64_t const  bit_width = std::atoi(ast.children().at(2ULL).token().name().c_str());
-    int64_t const  value = std::atoi(ast.children().at(1ULL).token().name().substr(2ULL).c_str());
+    uint64_t const  bit_width = (uint64_t)std::atoi(ast.children().at(2ULL).token().name().c_str());
+    uint64_t const  value = (uint64_t)std::atoi(ast.children().at(1ULL).token().name().substr(2ULL).c_str());
 
     switch (bit_width)
     {
-    case 8ULL: return num<uint8_t>(value);
-    case 16ULL: return num<uint16_t>(value);
-    case 32ULL: return num<uint32_t>(value);
-    case 64ULL: return num<uint64_t>(value);
+    case 8ULL: return num<uint8_t>((uint8_t)value);
+    case 16ULL: return num<uint16_t>((uint16_t)value);
+    case 32ULL: return num<uint32_t>((uint32_t)value);
+    case 64ULL: return num<uint64_t>((uint64_t)value);
     default:
         std::cerr << "ERROR[" << ast.children().at(2ULL).token().line() << ":" << ast.children().at(2ULL).token().column() << "]: "
                      "Wrong bit-with. Allowed values are 8, 16, 32, and 64.";

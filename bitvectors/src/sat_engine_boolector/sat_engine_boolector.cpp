@@ -2,8 +2,8 @@
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/bitvectors/detail/execute_shell_command_with_async_pipe.hpp>
 #include <rebours/bitvectors/detail/sat_checking_interruption_function.hpp>
-#include <rebours/bitvectors/detail/unique_handles.hpp>
-#include <rebours/bitvectors/detail/file_utils.hpp>
+#include <rebours/utility/unique_handle.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <mutex>
 #include <string>
 #include <sstream>
@@ -26,9 +26,9 @@ struct temp_files_clean_up
     ~temp_files_clean_up()
     {
         std::vector<std::string>  pathnames;
-        enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
+        fileutl::enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
         for (auto const& p : pathnames)
-            delete_file(p);
+            fileutl::delete_file(p);
     }
 } instance;
 

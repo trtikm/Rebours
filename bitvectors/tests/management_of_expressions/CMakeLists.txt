@@ -6,6 +6,7 @@ add_executable(management_of_expressions
 
 target_link_libraries(management_of_expressions
     bitvectors
+    utility
     )
 
 install(TARGETS management_of_expressions

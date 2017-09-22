@@ -2,10 +2,10 @@
 #   define REBOURS_BITVECTORS_EXPRESSION_HPP_INCLUDED
 
 #   include <rebours/bitvectors/symbol.hpp>
-#   include <rebours/bitvectors/large_types.hpp>
-#   include <rebours/bitvectors/assumptions.hpp>
-#   include <rebours/bitvectors/invariants.hpp>
-#   include <rebours/bitvectors/endian.hpp>
+#   include <rebours/utility/large_types.hpp>
+#   include <rebours/utility/assumptions.hpp>
+#   include <rebours/utility/invariants.hpp>
+#   include <rebours/utility/endian.hpp>
 #   include <limits>
 #   include <vector>
 #   include <string>
@@ -59,7 +59,7 @@ inline bool  operator !=(expression const  e0, expression const  e1) { return !(
 template<typename T>
 struct typed_expression
 {
-    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_t>::value,
+    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_type>::value,
                   "Only basic numeric types are allowed for the template parameter T.");
 
     static constexpr bool  is_of_integral_type() noexcept { return std::is_integral<T>::value; }
@@ -152,9 +152,9 @@ inline typed_expression<uint128_t>  num(uint128_t const&  value, bool const  in_
     return {make_symbol_of_interpreted_constant<uint128_t>(value,in_little_endian),{}};
 }
 
-inline typed_expression<float80_t>  num(float80_t const&  value, bool const  in_little_endian = is_this_little_endian_machine())
+inline typed_expression<float80_type>  num(float80_type const&  value, bool const  in_little_endian = is_this_little_endian_machine())
 {
-    return {make_symbol_of_interpreted_constant<float80_t>(value,in_little_endian),{}};
+    return {make_symbol_of_interpreted_constant<float80_type>(value,in_little_endian),{}};
 }
 
 
@@ -203,7 +203,7 @@ expression  make_cast_float_to_unsigned_int(expression const  arg0, uint64_t con
 template<typename T, typename S>
 typed_expression<T>  cast(typed_expression<S> const  arg0)
 {
-    static_assert(std::is_arithmetic<S>::value || std::is_same<S,uint128_t>::value || std::is_same<S,float80_t>::value,
+    static_assert(std::is_arithmetic<S>::value || std::is_same<S,uint128_t>::value || std::is_same<S,float80_type>::value,
                   "The cast operator was applied to a non-numeric expression type.");
     if (arg0.is_of_integral_type())
         if (typed_expression<T>::is_of_integral_type())
@@ -294,7 +294,7 @@ typed_expression<T>  cast(typed_expression<S> const  arg0)
             case 0x2020ULL: // 32 -> 32
             case 0x4040ULL: // 64 -> 64
             case 0x8080ULL: // 128 -> 128
-                return {arg0};
+                return typed_expression<T>{arg0};
             default:
                 UNREACHABLE();
             }
@@ -433,9 +433,9 @@ typed_expression<T>  cast(typed_expression<S> const  arg0)
             }
         else
         {
-            uint64_t const  num_tgt_bits = std::is_same<T,float80_t>::value ? 80ULL : sizeof(T)*8ULL;
+            uint64_t const  num_tgt_bits = std::is_same<T,float80_type>::value ? 80ULL : sizeof(T)*8ULL;
             if (num_bits_of_return_value(arg0) == num_tgt_bits)
-                return {arg0};
+                return typed_expression<T>{arg0};
             else
                 return make_cast_float(arg0,num_tgt_bits);
         }
@@ -457,8 +457,8 @@ struct to_coerced_type<base_type,false,produce_signed_type>
 template<typename S, typename T>
 struct coerce
 {
-    static_assert((std::is_arithmetic<S>::value || std::is_same<S,uint128_t>::value || std::is_same<S,float80_t>::value) &&
-                  (std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_t>::value),
+    static_assert((std::is_arithmetic<S>::value || std::is_same<S,uint128_t>::value || std::is_same<S,float80_type>::value) &&
+                  (std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_type>::value),
                   "The operator was applied to a non-numeric expression type.");
     using  base_type = typename std::conditional<sizeof(S) >= sizeof(T),S,T>::type;
     using  type = typename to_coerced_type<base_type,std::is_integral<base_type>::value,std::is_signed<S>::value || std::is_signed<T>::value>::type;
@@ -483,7 +483,7 @@ inline typed_expression<typename coerce<L,R>::type>  operator +(typed_expression
 template<typename T>
 inline typed_expression<T>  operator +(typed_expression<T> const  arg0)
 {
-    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_t>::value,
+    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_type>::value,
                   "The operator was applied to a non-numeric expression type.");
     return arg0;
 }
@@ -502,9 +502,9 @@ inline typed_expression<typename coerce<L,R>::type>  operator -(typed_expression
 template<typename T>
 inline typed_expression<T>  operator -(typed_expression<T> const  arg0)
 {
-    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_t>::value,
+    static_assert(std::is_arithmetic<T>::value || std::is_same<T,uint128_t>::value || std::is_same<T,float80_type>::value,
                   "The operator was applied to a non-numeric expression type.");
-    return {arg0.is_of_integral_type() ? make_subtraction_int(num<T>(0),arg0) : make_subtraction_float(num<T>(0.0),arg0)};
+    return {arg0.is_of_integral_type() ? make_subtraction_int(num<T>(0),arg0) : make_subtraction_float(num<T>((T)0.0),arg0)};
 }
 
 expression  make_multiply_int(expression const  arg0, expression const  arg1);
@@ -640,8 +640,8 @@ expression  make_less_than_float(expression const  arg0, expression const  arg1)
 template<typename L, typename R>
 inline expression  operator <(typed_expression<L> const  arg0, typed_expression<R> const  arg1)
 {
-    static_assert((std::is_arithmetic<L>::value || std::is_same<L,uint128_t>::value || std::is_same<L,float80_t>::value) &&
-                  (std::is_arithmetic<R>::value || std::is_same<R,uint128_t>::value || std::is_same<R,float80_t>::value),
+    static_assert((std::is_arithmetic<L>::value || std::is_same<L,uint128_t>::value || std::is_same<L,float80_type>::value) &&
+                  (std::is_arithmetic<R>::value || std::is_same<R,uint128_t>::value || std::is_same<R,float80_type>::value),
                   "The operator was applied to a non-numeric expression type.");
     static_assert(!arg0.is_of_integral_type() || arg0.is_of_signed_integral_type() == arg1.is_of_signed_integral_type(),
                   "The operator was passed the mixed signed/unsigned expression types as arguments.");
@@ -657,8 +657,8 @@ expression  make_equal_float(expression const  arg0, expression const  arg1);
 template<typename L, typename R>
 inline expression  operator ==(typed_expression<L> const  arg0, typed_expression<R> const  arg1)
 {
-    static_assert((std::is_arithmetic<L>::value || std::is_same<L,uint128_t>::value || std::is_same<L,float80_t>::value) &&
-                  (std::is_arithmetic<R>::value || std::is_same<R,uint128_t>::value || std::is_same<R,float80_t>::value),
+    static_assert((std::is_arithmetic<L>::value || std::is_same<L,uint128_t>::value || std::is_same<L,float80_type>::value) &&
+                  (std::is_arithmetic<R>::value || std::is_same<R,uint128_t>::value || std::is_same<R,float80_type>::value),
                   "The operator was applied to a non-numeric expression type.");
     using  rettype = typename coerce<L,R>::type;
     return { std::is_floating_point<rettype>::value ? make_equal_float(cast<rettype>(arg0),cast<rettype>(arg1)) :
