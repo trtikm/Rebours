@@ -108,6 +108,9 @@ add_library(utility
     ./include/rebours/utility/timestamp.hpp
     ./src/timestamp.cpp
 
+    ./include/rebours/utility/test.hpp
+    ./src/test.cpp
+
     ./include/rebours/utility/assumptions.hpp
     ./include/rebours/utility/invariants.hpp
 
@@ -122,6 +125,8 @@ add_library(utility
     ./include/rebours/utility/digraph.hpp
 
     ./include/rebours/utility/std_pair_hash.hpp
+
+    ./include/rebours/utility/macro_to_string.hpp
 
     ./include/rebours/utility/file_utils.hpp
     ./src/file_utils.cpp

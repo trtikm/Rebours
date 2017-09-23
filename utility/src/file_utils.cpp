@@ -4,57 +4,64 @@
 #include <rebours/utility/invariants.hpp>
 #include <rebours/utility/development.hpp>
 #include <rebours/utility/config.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/filesystem/path.hpp>
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
+#include <utility>
 #include <sstream>
 #include <vector>
+#include <mutex>
 
-#if defined(WIN32) //|| COMPILER() == COMPILER_VC()
-#   include <windows.h>
-#elif defined(__linux__) || defined(__APPLE__)
-#   include <sys/stat.h>
-#   include <glob.h>
-#endif
+//#if PLATFORM()==PLATFORM_WINDOWS()
+//#   include <windows.h>
+//#elif PLATFORM()==PLATFORM_LINUX() || PLATFORM()==PLATFORM_APPLE()
+//#   include <sys/stat.h>
+//#   include <glob.h>
+//#endif
 
-namespace fileutl { namespace {
-
-
-std::string::size_type  parse_last_dir_pos(std::string const&  file_pathname)
-{
-    std::string::size_type const  last_slash_pos = file_pathname.find_last_of('/');
-    std::string::size_type const  last_backslash_pos = file_pathname.find_last_of('\\');
-    std::string::size_type const  last_dir_pos =
-            last_slash_pos == std::string::npos ?
-                   (last_backslash_pos == std::string::npos ? 0ULL :
-                                                              last_backslash_pos + 1ULL) :
-                   (last_backslash_pos == std::string::npos ? last_slash_pos + 1ULL :
-                                                              (last_slash_pos < last_backslash_pos ? last_backslash_pos :
-                                                                                                     last_slash_pos))
-                   ;
-    INVARIANT(last_dir_pos <= file_pathname.size());
-    return last_dir_pos;
-}
+//namespace fileutl { namespace {
 
 
-}}
+//std::string::size_type  parse_last_dir_pos(std::string const&  file_pathname)
+//{
+//    std::string::size_type const  last_slash_pos = file_pathname.find_last_of('/');
+//    std::string::size_type const  last_backslash_pos = file_pathname.find_last_of('\\');
+//    std::string::size_type const  last_dir_pos =
+//            last_slash_pos == std::string::npos ?
+//                   (last_backslash_pos == std::string::npos ? 0ULL :
+//                                                              last_backslash_pos + 1ULL) :
+//                   (last_backslash_pos == std::string::npos ? last_slash_pos + 1ULL :
+//                                                              (last_slash_pos < last_backslash_pos ? last_backslash_pos :
+//                                                                                                     last_slash_pos))
+//                   ;
+//    INVARIANT(last_dir_pos <= file_pathname.size());
+//    return last_dir_pos;
+//}
+
+
+//}}
 
 namespace fileutl {
 
 
+namespace { std::mutex  g_disc_access_mutex; }
+
+
 bool  file_exists(std::string const&  pathname)
 {
-    std::ifstream  f{pathname,std::ios::binary};
-    return f.good();
+    return boost::filesystem::exists(pathname);
+//    std::ifstream  f{pathname,std::ios::binary};
+//    return f.good();
 }
 
 bool  is_directory(std::string const&  pathname)
 {
-    NOT_IMPLEMENTED_YET();
-
+    return boost::filesystem::is_directory(pathname);
 //    if (!file_exists(pathname))
 //        return false;
-//#   if defined(WIN32)
+//#   if PLATFORM()==PLATFORM_WINDOWS()
 //    return PathIsDirectory(pathname.c_str());
 //#   elif defined(__linux__) || defined(__APPLE__)
 //    struct stat buf;
@@ -68,52 +75,64 @@ bool  is_directory(std::string const&  pathname)
 
 uint64_t  file_size(std::string const&  file_pathname)
 {
-    std::ifstream  f{file_pathname,std::ios::binary};
-    std::streampos const  begin  = f.tellg();
-    f.seekg(0ULL,std::ios::end);
-    std::streampos const  end = f.tellg();
-    return end - begin;
+    return boost::filesystem::file_size(file_pathname);
+//    std::ifstream  f{file_pathname,std::ios::binary};
+//    std::streampos const  begin  = f.tellg();
+//    f.seekg(0ULL,std::ios::end);
+//    std::streampos const  end = f.tellg();
+//    return end - begin;
 }
 
 std::string  parse_name_in_pathname(std::string const&  file_pathname)
 {
-    return file_pathname.substr(parse_last_dir_pos(file_pathname));
+    return boost::filesystem::path(file_pathname).filename().string();
+//    return file_pathname.substr(parse_last_dir_pos(file_pathname));
 }
 
 std::string  parse_path_in_pathname(std::string const&  file_pathname)
 {
-    return file_pathname.substr(0U,parse_last_dir_pos(file_pathname));
+    return boost::filesystem::path(file_pathname).parent_path().string();
+//    return file_pathname.substr(0U,parse_last_dir_pos(file_pathname));
 }
 
 std::string  remove_extension(std::string const&  filename)
 {
-    return filename.substr(0U,filename.find_last_of('.'));
+    return (boost::filesystem::path(filename).parent_path() / boost::filesystem::path(filename).stem()).string();
+//    return filename.substr(0U,filename.find_last_of('.'));
 }
 
 void  create_directory(std::string const&  pathname)
 {
-#   if defined(WIN32)
-        std::system((std::string("mkdir \"") + pathname + "\"").c_str());
-#   elif defined(__linux__) || defined(__APPLE__)
-    auto ignore = std::system((std::string("mkdir -p \"") + pathname + "\"").c_str());
-    (void)ignore;
-#   else
-#       error "Unsuported platform."
-#   endif
+    boost::filesystem::create_directories(pathname);
+//#   if PLATFORM()==PLATFORM_WINDOWS()
+//        std::system((std::string("mkdir \"") + pathname + "\"").c_str());
+//#   elif PLATFORM()==PLATFORM_LINUX() || PLATFORM()==PLATFORM_APPLE()
+//        auto ignore = std::system((std::string("mkdir -p \"") + pathname + "\"").c_str());
+//        (void)ignore;
+//#   else
+//#       error "Unsuported platform."
+//#   endif
 }
 
 std::string  concatenate_file_paths(std::string const&  left_path, std::string const&  right_path)
 {
-    if (left_path.empty())
-        return right_path;
-    if (right_path.empty())
-        return left_path;
-    return left_path + "/" + right_path;
+    return (boost::filesystem::path(left_path) / boost::filesystem::path(right_path)).string();
+//    if (left_path.empty())
+//        return right_path;
+//    if (right_path.empty())
+//        return left_path;
+//    return left_path + "/" + right_path;
 }
 
 std::string  absolute_path(std::string const&  path)
 {
-    NOT_IMPLEMENTED_YET();
+    return boost::filesystem::absolute(path).string();
+//#   if PLATFORM()==PLATFORM_WINDOWS()
+//#elif PLATFORM()==PLATFORM_LINUX() || PLATFORM()==PLATFORM_APPLE()
+//#       error "Unsuported platform."
+//#endif
+
+//    NOT_IMPLEMENTED_YET();
 //    // TODO: portability - this implementation won't probably work on Windows...
 //    ASSUMPTION(file_exists(path));
 //    std::vector<char> buffer(10000,0);
@@ -122,34 +141,46 @@ std::string  absolute_path(std::string const&  path)
 
 std::string  normalise_path(std::string const&  path)
 {
-    std::string  result = path;
-    std::replace(result.begin(),result.end(),'\\','/');
-    std::string::size_type  pos = 0;
-    while((pos = result.find("/./",0)) != std::string::npos)
-        result.replace(pos,3,"/");
-    // TODO: more fixes should be applied (e.g. /../, //, etc.)
-    return result;
+    return boost::filesystem::path(path).normalize().string();
+//    std::string  result = path;
+//    std::replace(result.begin(),result.end(),'\\','/');
+//    std::string::size_type  pos = 0;
+//    while((pos = result.find("/./",0)) != std::string::npos)
+//        result.replace(pos,3,"/");
+//    // TODO: more fixes should be applied (e.g. /../, //, etc.)
+//    return result;
 }
 
 void  split_pathname(std::string const&  pathname, std::vector<std::string>& output)
 {
-    std::istringstream  istr(normalise_path(pathname));
-    std::string  token;
-    while (std::getline(istr,token,'/'))
-        output.push_back(token);
+    boost::filesystem::path p(pathname);
+    while (!p.empty())
+    {
+        output.push_back(p.filename().string());
+        p = p.parent_path();
+    }
+    std::reverse(output.begin(),output.end());
+//    std::istringstream  istr(normalise_path(pathname));
+//    std::string  token;
+//    while (std::getline(istr,token,'/'))
+//        output.push_back(token);
 }
 
 std::string  join_path_parts(std::vector<std::string> const&  parts)
 {
-    if (parts.empty())
-        return "";
-    std::string  result = parts.at(0);
-    for (uint64_t  i = 1ULL; i < parts.size(); ++i)
-    {
-        result.push_back('/');
-        result.append(parts.at(i));
-    }
-    return result;
+    boost::filesystem::path p;
+    for (auto const& part : parts)
+        p /= part;
+    return p.string();
+//    if (parts.empty())
+//        return "";
+//    std::string  result = parts.at(0);
+//    for (uint64_t  i = 1ULL; i < parts.size(); ++i)
+//    {
+//        result.push_back('/');
+//        result.append(parts.at(i));
+//    }
+//    return result;
 }
 
 std::string  get_common_preffix(std::string const&  pathname1, std::string const&  pathname2)
@@ -191,9 +222,19 @@ std::string  get_relative_path(std::string const&  pathname, std::string const& 
     return result;
 }
 
-void  enumerate_files_by_pattern(const std::string&  pattern, std::vector<std::string>&  output_pathnames)
+void  enumerate_files_in_directory(
+        const std::string&  dir,
+        std::vector<std::string>&  output_pathnames,
+        std::function<bool(const std::string&)> filter)
 {
-    NOT_IMPLEMENTED_YET();
+    std::lock_guard<std::mutex> lock(g_disc_access_mutex);
+    boost::filesystem::path ppp(dir);
+    for (boost::filesystem::directory_iterator it(dir); it != boost::filesystem::directory_iterator(); ++it)
+    {
+        std::string const  p = it->path().string();
+        if (boost::filesystem::is_regular_file(p) && filter(p))
+            output_pathnames.push_back(p);
+    }
 //    ::glob_t glob_result;
 //    ::glob(pattern.c_str(),GLOB_TILDE,NULL,&glob_result);
 //    for(unsigned int i = 0U; i < glob_result.gl_pathc; ++i)
@@ -201,9 +242,24 @@ void  enumerate_files_by_pattern(const std::string&  pattern, std::vector<std::s
 //    globfree(&glob_result);
 }
 
+void  enumerate_all_files_under_directory(
+        const std::string&  dir,
+        std::vector<std::string>&  output_pathnames,
+        std::function<bool(const std::string&)> filter)
+{
+    std::lock_guard<std::mutex> lock(g_disc_access_mutex);
+    for (boost::filesystem::recursive_directory_iterator it(dir); it != boost::filesystem::recursive_directory_iterator(); ++it)
+    {
+        std::string const  p = it->path().string();
+        if (boost::filesystem::is_regular_file(p) && filter(p))
+            output_pathnames.push_back(p);
+    }
+}
+
 bool  delete_file(const std::string&  pathname)
 {
-    return std::remove(pathname.c_str()) != 0;
+    return boost::filesystem::remove(pathname);
+//    return std::remove(pathname.c_str()) != 0;
 }
 
 

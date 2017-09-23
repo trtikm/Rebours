@@ -15,7 +15,7 @@
                 ::tmprof_internal_private_implementation_details::                  \
                     create_new_record_for_block(__FILE__,__LINE__,__FUNCTION__);    \
             ::tmprof_internal_private_implementation_details::block_stop_watches    \
-                const  ___tmprof__stop_watches__ ( ___tmprof__Record__pointer__ );
+                const  ___tmprof__stop_watches__ ( ___tmprof__Record__pointer__ )
 #       define TMPROF_PRINT_TO_STREAM(stream) print_time_profile_to_stream(stream);
 #       define TMPROF_PRINT_TO_FILE(fname,extend_fname_by_timestamp)                         \
             print_time_profile_to_file(fname,extend_fname_by_timestamp);

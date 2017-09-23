@@ -3,6 +3,7 @@
 
 #   include <string>
 #   include <vector>
+#   include <functional>
 #   include <cstdint>
 #   include <iosfwd>
 
@@ -30,7 +31,14 @@ void  split_pathname(std::string const&  pathname, std::vector<std::string>& out
 std::string  join_path_parts(std::vector<std::string> const&  parts);
 std::string  get_common_preffix(std::string const&  pathname1, std::string const&  pathname2);
 std::string  get_relative_path(std::string const&  pathname, std::string const&  directory);
-void  enumerate_files_by_pattern(const std::string&  pattern, std::vector<std::string>&  output_pathnames);
+void  enumerate_files_in_directory(
+        const std::string&  dir,
+        std::vector<std::string>&  output_pathnames,
+        std::function<bool(const std::string&)> filter = [](const std::string&) { return true; });
+void  enumerate_all_files_under_directory( // Performs enumeration also in all sub-directories.
+        const std::string&  dir,
+        std::vector<std::string>&  output_pathnames,
+        std::function<bool(const std::string&)> filter = [](const std::string&) { return true; });
 bool  delete_file(const std::string&  pathname);
 
 void  skip_bytes(std::ifstream&  stream, uint64_t const count);
@@ -44,6 +52,25 @@ uint32_t  read_bytes_to_uint32_t(std::ifstream&  stream, uint8_t const  num_byte
 int32_t  read_bytes_to_int32_t(std::ifstream&  stream, uint8_t const  num_bytes, bool const  is_in_big_endian);
 uint64_t  read_bytes_to_uint64_t(std::ifstream&  stream, uint8_t const  num_bytes, bool const  is_in_big_endian);
 int64_t  read_bytes_to_int64_t(std::ifstream&  stream, uint8_t const  num_bytes, bool const  is_in_big_endian);
+
+
+}
+
+namespace fileutl {
+
+
+struct file_auto_deleter
+{
+    file_auto_deleter(std::string const&  pathname)
+        : m_pathname(pathname)
+    {}
+    ~file_auto_deleter()
+    {
+        fileutl::delete_file(m_pathname);
+    }
+private:
+    std::string  m_pathname;
+};
 
 
 }
