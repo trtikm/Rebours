@@ -4,14 +4,12 @@
 #include <rebours/bitvectors/detail/sat_checking_interruption_function.hpp>
 #include <rebours/utility/unique_handle.hpp>
 #include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/macro_to_string.hpp>
 #include <mutex>
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
-
-#define XSTR(s) STR(s)
-#define STR(s) #s
 
 namespace bv { namespace detail { namespace {
 
@@ -20,17 +18,6 @@ std::string  get_expression_file_path_prefix()
 {
     return "./bitvectors_sat_engine_boolector_temp_file_number_";
 }
-
-struct temp_files_clean_up
-{
-    ~temp_files_clean_up()
-    {
-        std::vector<std::string>  pathnames;
-        fileutl::enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
-        for (auto const& p : pathnames)
-            fileutl::delete_file(p);
-    }
-} instance;
 
 std::string  get_expression_file_path(unique_handle const&  id)
 {
@@ -41,7 +28,7 @@ std::string  get_expression_file_path(unique_handle const&  id)
 
 std::string  get_path_to_boolector_binary()
 {
-    return std::string(XSTR(BOOLECTOR_ROOT)) + "/boolector";
+    return std::string(MACRO_TO_STRING(BOOLECTOR_ROOT)) + "/boolector";
 }
 
 std::string  get_boolector_exec_command(uint32_t const  timeout_milliseconds, bool const  get_model,
@@ -155,6 +142,7 @@ void  is_satisfiable_boolector(expression const  e, uint32_t const  timeout_mill
 {
     unique_handle const  smtlib2_file_id;
     std::string const  smtlib2_file_path_name = get_expression_file_path(smtlib2_file_id);
+    fileutl::file_auto_deleter const  temp_file_deleter(smtlib2_file_path_name);
     {
         std::ofstream  expr_stream(smtlib2_file_path_name,std::ofstream::out);
         expr_stream << e;
@@ -181,6 +169,7 @@ void  get_model_if_satisfiable_boolector(expression const  e, uint32_t const  ti
 {
     unique_handle const  smtlib2_file_id;
     std::string const  smtlib2_file_path_name = get_expression_file_path(smtlib2_file_id);
+    fileutl::file_auto_deleter const  temp_file_deleter(smtlib2_file_path_name);
     {
         std::ofstream  expr_stream(smtlib2_file_path_name,std::ofstream::out);
         expr_stream << e;

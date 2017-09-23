@@ -23,17 +23,6 @@ std::string  get_expression_file_path_prefix()
     return "./bitvectors_sat_engine_mathsat5_temp_file_number_";
 }
 
-struct temp_files_clean_up
-{
-    ~temp_files_clean_up()
-    {
-        std::vector<std::string>  pathnames;
-        fileutl::enumerate_files_by_pattern(get_expression_file_path_prefix() + "*",pathnames);
-        for (auto const& p : pathnames)
-            fileutl::delete_file(p);
-    }
-} instance;
-
 std::string  get_expression_file_path(unique_handle const&  id)
 {
     std::stringstream  sstr;
@@ -212,6 +201,7 @@ void  is_satisfiable_mathsat5(expression const  e, uint32_t const  timeout_milli
 {
     unique_handle const  smtlib2_file_id;
     std::string const  smtlib2_file_path_name = get_expression_file_path(smtlib2_file_id);
+    fileutl::file_auto_deleter const  temp_file_deleter(smtlib2_file_path_name);
     {
         std::ofstream  expr_stream(smtlib2_file_path_name,std::ofstream::out);
         expr_stream << e;
@@ -238,6 +228,7 @@ void  get_model_if_satisfiable_mathsat5(expression const  e, uint32_t const  tim
 {
     unique_handle const  smtlib2_file_id;
     std::string const  smtlib2_file_path_name = get_expression_file_path(smtlib2_file_id);
+    fileutl::file_auto_deleter const  temp_file_deleter(smtlib2_file_path_name);
     {
         std::ofstream  expr_stream(smtlib2_file_path_name,std::ofstream::out);
         expr_stream << e;

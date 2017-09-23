@@ -25,7 +25,9 @@ namespace bv { namespace detail {
 bool  execute_shell_command_with_async_pipe(std::string const& shell_command, std::function<bool()> const&  interrupt,
                                             std::stringstream&  ostr)
 {
-    NOT_IMPLEMENTED_YET();
+    std::cerr << "bv::detail::execute_shell_command_with_async_pipe() : "
+                 "Window's version of this function IS NOT IMPLEMENTED YET." << std::endl;
+    return false;
 }
 
 
@@ -210,7 +212,11 @@ bool  execute_shell_command_with_async_pipe(std::string const& shell_command, st
                         process_id_ostr << buff[i];
                 process_id = std::atoi(process_id_ostr.str().c_str());
                 if (process_id <= 0)
-                    throw std::runtime_error("execute_shell_command_with_async_pipe : cannot parse id of the executed process.");
+                {
+                    std::cerr << "bv::detail::execute_shell_command_with_async_pipe() : "
+                                 "Cannot parse id of the executed process." << std::endl;
+                    return false;
+                }
                 ++i;
             }
             for ( ; i < num_read; ++i)

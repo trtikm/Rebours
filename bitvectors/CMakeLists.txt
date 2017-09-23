@@ -60,6 +60,40 @@ include_directories(
 
 find_package(Threads)
 
+# find and add Boost
+message("Searching for Boost library ...")
+if(NOT DEFINED BOOST_INSTALL_DIR)
+    set(BOOST_INSTALL_DIR "Specify boost's installation directory." CACHE STRING "Specify boost's installation directory." FORCE)
+endif()
+if(EXISTS "${BOOST_INSTALL_DIR}" AND IS_DIRECTORY "${BOOST_INSTALL_DIR}")
+    set(BOOST_ROOT ${BOOST_INSTALL_DIR})
+endif()
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS
+                system
+                thread
+                chrono
+                log_setup
+                log
+                filesystem
+                program_options
+             REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+add_definitions("-DBOOST_LOG_SETUP")
+set(BOOST_LIST_OF_LIBRARIES_TO_LINK_WITH
+        ${Boost_LIBRARIES}
+    )
+if(DEFINED BOOST_ROOT)
+    message("Boost was found in directory: " ${BOOST_ROOT})
+    message("Boost includes were found in directory: " ${Boost_INCLUDE_DIRS})
+    message("Boost libraries were found in directory: " ${Boost_LIBRARY_DIRS})
+else()
+    message(SEND_ERROR "The installation directory of Boost was not FOUND!")
+endif()
+
 # Add Z3 SMT solver
 if(NOT DEFINED Z3_ROOT)
     set(Z3_ROOT "Z3-NOTFOUND" CACHE STRING "Specify Z3's install path" FORCE)

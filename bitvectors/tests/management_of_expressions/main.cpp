@@ -9,7 +9,7 @@
 
 static void test_expression_construction()
 {
-    std::cout << "Starting: test_expression_construction()\n";
+    TEST_MESSAGE("Starting: test_expression_construction()");
 
     bv::typed_expression<int> const  n0 = bv::num(10);
     TEST_SUCCESS(n0.operator bool());
@@ -205,34 +205,11 @@ static void test_expression_construction()
     TEST_SUCCESS(bv::symbol_name(bv::argument(c1,1ULL)) == "!");
     TEST_SUCCESS(bv::is_negation(bv::argument(c1,1ULL)));
     TEST_SUCCESS(bv::is_formula(c1));
-
-    std::cout << "SUCCESS\n";
 }
 
-static void save_crash_report(std::string const& crash_message)
+static void  management_of_expressions()
 {
-    std::cout << "ERROR: " << crash_message << "\n";
-    std::ofstream  ofile("management_of_expressions_CRASH.txt", std::ios_base::app );
-    ofile << crash_message << "\n";
+    test_expression_construction();
 }
 
-int main(int argc, char* argv[])
-{
-    (void)argc;
-    (void)argv;
-    try
-    {
-        test_expression_construction();
-    }
-    catch(std::exception const& e)
-    {
-        try { save_crash_report(e.what()); } catch (...) {}
-        return -1;
-    }
-    catch(...)
-    {
-        try { save_crash_report("Unknown exception was thrown."); } catch (...) {}
-        return -2;
-    }
-    return 0;
-}
+TEST_DEFINE_MAIN_FUNCTION_CALLING(management_of_expressions)

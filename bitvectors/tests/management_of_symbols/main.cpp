@@ -7,7 +7,7 @@
 
 static void test_symbol_construction()
 {
-    std::cout << "Starting: test_symbol_construction()\n";
+    TEST_MESSAGE("Starting: test_symbol_construction()");
 
     bv::symbol const  num10 = bv::make_symbol_of_interpreted_constant(int16_t(10));
     TEST_SUCCESS(num10.operator bool());
@@ -35,34 +35,11 @@ static void test_symbol_construction()
 
     TEST_FAILURE(num10 == F);
     TEST_SUCCESS(F == F2);
-
-    std::cout << "SUCCESS\n";
 }
 
-static void save_crash_report(std::string const& crash_message)
+static void  management_of_symbols()
 {
-    std::cout << "ERROR: " << crash_message << "\n";
-    std::ofstream  ofile("management_of_symbols_CRASH.txt", std::ios_base::app );
-    ofile << crash_message << "\n";
+    test_symbol_construction();
 }
 
-int main(int argc, char* argv[])
-{
-    (void)argc;
-    (void)argv;
-    try
-    {
-        test_symbol_construction();
-    }
-    catch(std::exception const& e)
-    {
-        try { save_crash_report(e.what()); } catch (...) {}
-        return -1;
-    }
-    catch(...)
-    {
-        try { save_crash_report("Unknown exception was thrown."); } catch (...) {}
-        return -2;
-    }
-    return 0;
-}
+TEST_DEFINE_MAIN_FUNCTION_CALLING(management_of_symbols)

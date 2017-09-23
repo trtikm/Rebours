@@ -1,16 +1,12 @@
 #include <rebours/bitvectors/expression.hpp>
 #include <rebours/bitvectors/expression_io.hpp>
 #include <rebours/utility/test.hpp>
-#include <stdexcept>
 #include <iostream>
 #include <sstream>
-#include <fstream>
 
 
-static void test_expression_io()
+static void expressions_io()
 {
-    std::cout << "Starting: test_expression_io()\n";
-
     bv::typed_expression<int32_t> const  i10 = bv::num(10);
     bv::typed_expression<float> const  pi = bv::num(3.1415f);
     bv::typed_expression<uint32_t> const  u5 = bv::num(5U);
@@ -171,11 +167,11 @@ static void test_expression_io()
         TEST_SUCCESS(sstr.str() ==
                      "(set-logic QF_UFBV)\n\n"
                      "(declare-fun v0 () (_ BitVec 32))\n"
-                     "(declare-fun cast_f32u32 ((_ BitVec 32)) (_ BitVec 32))\n\n"
+                     "(declare-fun cast_f32s32 ((_ BitVec 32)) (_ BitVec 32))\n\n"
                      "(assert\n"
                      "    (=\n"
                      "        v0\n"
-                     "        (cast_f32u32\n"
+                     "        (cast_f32s32\n"
                      "            #x40490e56\n"
                      "            )\n"
                      "        )\n"
@@ -270,34 +266,6 @@ static void test_expression_io()
         //std::cout << loaded; std::cout.flush();
         TEST_SUCCESS(original == loaded);
     }
-
-    std::cout << "SUCCESS\n";
 }
 
-static void save_crash_report(std::string const& crash_message)
-{
-    std::cout << crash_message << "\n";
-    std::ofstream  ofile("expression_io_CRASH.txt", std::ios_base::app );
-    ofile << crash_message << "\n";
-}
-
-int main(int argc, char* argv[])
-{
-    (void)argc;
-    (void)argv;
-    try
-    {
-        test_expression_io();
-    }
-    catch(std::exception const& e)
-    {
-        try { save_crash_report(e.what()); } catch (...) {}
-        return -1;
-    }
-    catch(...)
-    {
-        try { save_crash_report("Unknown exception was thrown."); } catch (...) {}
-        return -2;
-    }
-    return 0;
-}
+TEST_DEFINE_MAIN_FUNCTION_CALLING(expressions_io)

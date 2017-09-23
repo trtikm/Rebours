@@ -20,9 +20,10 @@ enum struct sat_result : uint8_t {
 
 
 enum struct sat_engine : uint8_t {
-        Z3          = 0x00U,
-        BOOLECTOR   = 0x01U,
-        MATHSAT5    = 0x02U,
+        NONE        = 0x00U,
+        Z3          = 0x01U,
+        BOOLECTOR   = 0x02U,
+        MATHSAT5    = 0x03U,
 };
 
 

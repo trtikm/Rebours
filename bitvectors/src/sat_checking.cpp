@@ -154,6 +154,7 @@ std::string  to_string(sat_engine const  value)
 {
     switch (value)
     {
+    case sat_engine::NONE: return "NONE";
     case sat_engine::Z3: return "Z3";
     case sat_engine::BOOLECTOR: return "BOOLECTOR";
     case sat_engine::MATHSAT5: return "MATHSAT5";
