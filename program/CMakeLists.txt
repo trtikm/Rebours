@@ -22,14 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
@@ -62,20 +63,18 @@ include_directories(
 find_package(Threads)
 
 
-add_library(program
-    ./include/rebours/program/assumptions.hpp
-    ./include/rebours/program/invariants.hpp
-    ./include/rebours/program/endian.hpp
-    ./include/rebours/program/msgstream.hpp
-    ./include/rebours/program/test.hpp
-    ./include/rebours/program/development.hpp
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
 
-    ./include/rebours/program/digraph.hpp
+
+add_library(program
     ./include/rebours/program/program.hpp
     ./src/program.cpp
-
-    ./include/rebours/program/large_types.hpp
-    ./src/large_types.cpp
 
     ./include/rebours/program/instruction.hpp
     ./src/instruction.cpp

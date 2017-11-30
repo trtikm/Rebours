@@ -1,11 +1,11 @@
 #ifndef REBOURS_PROGRAM_MICROCODE_INSTRUCTION_HPP_INCLUDED
 #   define REBOURS_PROGRAM_MICROCODE_INSTRUCTION_HPP_INCLUDED
 
-#   include <rebours/program/large_types.hpp>
-#   include <rebours/program/endian.hpp>
-#   include <rebours/program/assumptions.hpp>
-#   include <rebours/program/invariants.hpp>
-#   include <rebours/program/endian.hpp>
+#   include <rebours/utility/large_types.hpp>
+#   include <rebours/utility/endian.hpp>
+#   include <rebours/utility/assumptions.hpp>
+#   include <rebours/utility/invariants.hpp>
+#   include <rebours/utility/endian.hpp>
 #   include <vector>
 #   include <array>
 #   include <iterator>
@@ -200,7 +200,7 @@ instruction  create_BITOPERATIONS__REG_ASGN_REG_LSHIFT_REG(uint8_t const  n, uin
 
 instruction  create_FLOATINGPOINTCOMPARISONS__REG_ASGN_REG_EQUAL_TO_ZERO(uint64_t const  a0, uint64_t const  a1);
 
-instruction  create_FLOATINGPOINTARITHMETICS__REG_ASGN_REG_PLUS_NUMBER(uint64_t const  a0, uint64_t const  a1, float80_t const&  f);
+instruction  create_FLOATINGPOINTARITHMETICS__REG_ASGN_REG_PLUS_NUMBER(uint64_t const  a0, uint64_t const  a1, float80_type const&  f);
 
 instruction  create_INTERRUPTS__REG_ASGN_INTERRUPT_SET_AT_FIXED_NUMBER(uint8_t const  n, uint64_t const  a0, uint64_t const  a1, uint64_t const  v);
 instruction  create_INTERRUPTS__REG_ASGN_INTERRUPT_GET_AT_FIXED_NUMBER(uint8_t const  n, uint64_t const  a, uint64_t const  v);
@@ -254,7 +254,7 @@ private:
     return_type  get_argument(uint64_t const  index, return_type const* const = nullptr) const;
 
     uint128_t  get_argument(uint64_t const  index, uint128_t const* const = nullptr) const;
-    float80_t  get_argument(uint64_t const  index, float80_t const* const = nullptr) const;
+    float80_type  get_argument(uint64_t const  index, float80_type const* const = nullptr) const;
 
 
     detail::instruction const*  m_value;

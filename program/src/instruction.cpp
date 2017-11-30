@@ -1,5 +1,5 @@
 #include <rebours/program/instruction.hpp>
-#include <rebours/program/assumptions.hpp>
+#include <rebours/utility/assumptions.hpp>
 #include <unordered_set>
 #include <array>
 #include <limits>
@@ -92,7 +92,7 @@ instruction::instruction(std::vector<uint8_t> const&  separators, std::vector<ui
                         if (separators.at(i) > separators.at(i-1U))
                             return false;
                     return true;
-                    }
+                    }(m_separators)
                 ));
 }
 
@@ -107,7 +107,7 @@ uint8_t  instruction::argument_size(uint64_t const  argument_index) const
     {
         ASSUMPTION(argument_index < m_separators.size());
         return argument_index + 1ULL < m_separators.size() ? m_separators.at(argument_index + 1ULL) - m_separators.at(argument_index) :
-                                                             m_data.size() - m_separators.at(argument_index);
+                                                             (uint8_t)m_data.size() - m_separators.at(argument_index);
     }
 }
 
@@ -129,7 +129,7 @@ uint8_t const*  instruction::argument_begin(uint64_t const  argument_index) cons
 std::size_t  instruction_hash(instruction const&  I)
 {
     std::size_t  result = 0ULL;
-    for (uint8_t i = 0ULL, n = I.data().size() < 32ULL ? I.data().size() : 32ULL; i < n; ++i)
+    for (uint8_t i = 0ULL, n = (uint8_t)(I.data().size() < 32ULL ? I.data().size() : 32ULL); i < n; ++i)
         result += (i + 1ULL) * 101ULL * std::hash<uint64_t>()(I.data().at(i));
     return result;
 }
@@ -212,7 +212,7 @@ struct builder
         ASSUMPTION((uint64_t)m_cursor + (end - begin) <= 0xffULL);
         INVARIANT(m_cursor == m_data.size());
         m_separators.push_back(m_cursor);
-        m_cursor += (end - begin);
+        m_cursor += (uint8_t)(end - begin);
         for ( ; begin != end; ++begin)
             m_data.push_back(*begin);
         return *this;
@@ -242,7 +242,7 @@ struct builder
         return store(value.data(),value.data()+value.size());
     }
 
-    builder& operator<<(float80_t const&  value)
+    builder& operator<<(float80_type const&  value)
     {
         return store(value.data(),value.data()+value.size());
     }
@@ -298,7 +298,7 @@ uint8_t  num_instructions()
 
 uint8_t  num_instruction_groups()
 {
-    return detail::GIDs.size();
+    return (uint8_t)detail::GIDs.size();
 }
 
 uint8_t  num_instruction_subgroups(microcode::GID const  GID)
@@ -366,12 +366,12 @@ uint128_t  instruction::get_argument(uint64_t const  index, uint128_t const* con
     return std::move(retval);
 }
 
-float80_t  instruction::get_argument(uint64_t const  index, float80_t const* const) const
+float80_type  instruction::get_argument(uint64_t const  index, float80_type const* const) const
 {
     ASSUMPTION(index < num_arguments());
     uint8_t const  size = argument_size(index);
     uint8_t const* const  begin = argument_begin(index);
-    float80_t  retval;
+    float80_type  retval;
     retval.fill(0U);
     ASSUMPTION(size <= retval.size());
     std::copy(begin,begin+size,retval.begin());
@@ -817,7 +817,7 @@ instruction  create_FLOATINGPOINTCOMPARISONS__REG_ASGN_REG_EQUAL_TO_ZERO(uint64_
 }
 
 
-instruction  create_FLOATINGPOINTARITHMETICS__REG_ASGN_REG_PLUS_NUMBER(uint64_t const  a0, uint64_t const  a1, float80_t const&  f)
+instruction  create_FLOATINGPOINTARITHMETICS__REG_ASGN_REG_PLUS_NUMBER(uint64_t const  a0, uint64_t const  a1, float80_type const&  f)
 {
     ASSUMPTION(a0 <= std::numeric_limits<uint64_t>::max() - 10ULL);
     ASSUMPTION(a1 <= std::numeric_limits<uint64_t>::max() - 10ULL);

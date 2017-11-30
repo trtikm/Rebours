@@ -1,7 +1,7 @@
 #ifndef REBOURS_PROGRAM_MICROCODE_PROGRAM_HPP_INCLUDED
 #   define REBOURS_PROGRAM_MICROCODE_PROGRAM_HPP_INCLUDED
 
-#   include <rebours/program/digraph.hpp>
+#   include <rebours/utility/digraph.hpp>
 #   include <rebours/program/instruction.hpp>
 #   include <memory>
 #   include <vector>
