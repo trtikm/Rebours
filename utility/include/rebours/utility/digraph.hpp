@@ -277,16 +277,16 @@ struct digraph : public detail::digraph<node_data_type__,edge_data_type__>
 {
     using  super = detail::digraph<node_data_type__,edge_data_type__>;
 
-    typename super::node_data_type const&  data(typename super::node_id const  n) const;
-    typename super::node_data_type&  data(typename super::node_id const  n);
+    node_data_type const&  data(node_id const  n) const;
+    node_data_type&  data(node_id const  n);
 
-    typename super::edge_data_type const&  data(typename super::edge_id const  e) const;
-    typename super::edge_data_type&  data(typename super::edge_id const  e);
+    edge_data_type const&  data(edge_id const  e) const;
+    edge_data_type&  data(edge_id const  e);
 };
 
 template<typename node_data_type__, typename edge_data_type__>
-typename detail::digraph<node_data_type__,edge_data_type__>::node_data_type const&
-digraph<node_data_type__,edge_data_type__>::data(typename super::node_id const  n) const
+typename digraph<node_data_type__,edge_data_type__>::node_data_type const&
+digraph<node_data_type__,edge_data_type__>::data(node_id const  n) const
 {
     auto const  it = this->nodes().find(n);
     ASSUMPTION(it !=  this->nodes().cend());
@@ -294,17 +294,17 @@ digraph<node_data_type__,edge_data_type__>::data(typename super::node_id const  
 }
 
 template<typename node_data_type__, typename edge_data_type__>
-typename detail::digraph<node_data_type__,edge_data_type__>::node_data_type&
-digraph<node_data_type__,edge_data_type__>::data(typename super::node_id const  n)
+typename digraph<node_data_type__,edge_data_type__>::node_data_type&
+digraph<node_data_type__,edge_data_type__>::data(node_id const  n)
 {
     auto const  it = this->nodes().find(n);
     ASSUMPTION(it !=  this->nodes().end());
-    return const_cast<typename super::node_data_type&>(it->second);
+    return const_cast<node_data_type&>(it->second);
 }
 
 template<typename node_data_type__, typename edge_data_type__>
-typename detail::digraph<node_data_type__,edge_data_type__>::edge_data_type const&
-digraph<node_data_type__,edge_data_type__>::data(typename super::edge_id const  e) const
+typename digraph<node_data_type__,edge_data_type__>::edge_data_type const&
+digraph<node_data_type__,edge_data_type__>::data(edge_id const  e) const
 {
     auto const  it = this->edges().find(e);
     ASSUMPTION(it !=  this->edges().cend());
@@ -312,12 +312,12 @@ digraph<node_data_type__,edge_data_type__>::data(typename super::edge_id const  
 }
 
 template<typename node_data_type__, typename edge_data_type__>
-typename detail::digraph<node_data_type__,edge_data_type__>::edge_data_type&
-digraph<node_data_type__,edge_data_type__>::data(typename super::edge_id const  e)
+typename digraph<node_data_type__,edge_data_type__>::edge_data_type&
+digraph<node_data_type__,edge_data_type__>::data(edge_id const  e)
 {
     auto const  it = this->edges().find(e);
     ASSUMPTION(it !=  this->edges().cend());
-    return const_cast<typename super::edge_data_type&>(it->second);
+    return const_cast<edge_data_type&>(it->second);
 }
 
 
@@ -330,13 +330,13 @@ struct digraph<node_data_type__,void> : public detail::digraph<node_data_type__,
 {
     using  super = detail::digraph<node_data_type__,void>;
 
-    typename super::node_data_type const&  data(typename super::node_id const  n) const;
-    typename super::node_data_type&  data(typename super::node_id const  n);
+    node_data_type const&  data(node_id const  n) const;
+    node_data_type&  data(node_id const  n);
 };
 
 template<typename node_data_type__>
-typename detail::digraph<node_data_type__,void>::node_data_type const&
-digraph<node_data_type__,void>::data(typename super::node_id const  n) const
+typename digraph<node_data_type__,void>::node_data_type const&
+digraph<node_data_type__,void>::data(node_id const  n) const
 {
     auto const  it = this->nodes().find(n);
     ASSUMPTION(it !=  this->nodes().cend());
@@ -344,12 +344,12 @@ digraph<node_data_type__,void>::data(typename super::node_id const  n) const
 }
 
 template<typename node_data_type__>
-typename detail::digraph<node_data_type__,void>::node_data_type&
-digraph<node_data_type__,void>::data(typename super::node_id const  n)
+typename digraph<node_data_type__,void>::node_data_type&
+digraph<node_data_type__,void>::data(node_id const  n)
 {
     auto const  it = this->nodes().find(n);
     ASSUMPTION(it !=  this->nodes().end());
-    return const_cast<typename super::node_data_type&>(it->second);
+    return const_cast<node_data_type&>(it->second);
 }
 
 
@@ -363,13 +363,13 @@ struct digraph<void,edge_data_type__> :public  detail::digraph<void,edge_data_ty
 {
     using  super = detail::digraph<void,edge_data_type__>;
 
-    typename super::edge_data_type const&  data(typename super::edge_id const  e) const;
-    typename super::edge_data_type&  data(typename super::edge_id const  e);
+    edge_data_type const&  data(edge_id const  e) const;
+    edge_data_type&  data(edge_id const  e);
 };
 
 template<typename edge_data_type__>
-typename detail::digraph<void,edge_data_type__>::edge_data_type const&
-digraph<void,edge_data_type__>::data(typename super::edge_id const  e) const
+typename digraph<void,edge_data_type__>::edge_data_type const&
+digraph<void,edge_data_type__>::data(edge_id const  e) const
 {
     auto const  it = this->edges().find(e);
     ASSUMPTION(it !=  this->edges().cend());
@@ -377,12 +377,12 @@ digraph<void,edge_data_type__>::data(typename super::edge_id const  e) const
 }
 
 template<typename edge_data_type__>
-typename detail::digraph<void,edge_data_type__>::edge_data_type&
-digraph<void,edge_data_type__>::data(typename super::edge_id const  e)
+typename digraph<void,edge_data_type__>::edge_data_type&
+digraph<void,edge_data_type__>::data(edge_id const  e)
 {
     auto const  it = this->edges().find(e);
     ASSUMPTION(it !=  this->edges().cend());
-    return const_cast<typename super::edge_data_type&>(it->second);
+    return const_cast<edge_data_type&>(it->second);
 }
 
 
