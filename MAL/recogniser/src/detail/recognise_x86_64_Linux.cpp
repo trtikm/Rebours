@@ -3,10 +3,11 @@
 #include <rebours/MAL/recogniser/detail/recognise_x86_64_Linux_syscall_syscall.hpp>
 #include <rebours/MAL/recogniser/detail/register_info.hpp>
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
-#include <rebours/MAL/recogniser/msgstream.hpp>
-#include <rebours/MAL/recogniser/development.hpp>
+#include <rebours/utility/large_types.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/development.hpp>
 #include <type_traits>
 #include <algorithm>
 #include <iomanip>
@@ -47,7 +48,7 @@ void  recognition_data::recognise(descriptor::storage const&  description)
             set_error_rights(rights);
             return;
         }
-        buffer().push_back(res_val);
+        buffer().push_back((uint8_t)res_val);
         cs_insn*  ptr = nullptr;
         size_t const  count = cs_disasm(handle,buffer().data(),buffer().size(),0ULL,1ULL,&ptr);
         INVARIANT(count < 2ULL);
@@ -995,7 +996,7 @@ bool  recognition_data::recognise_MOVDQU(recognition_engine const& re, descripto
         }
         n = component().insert_sequence(n,{
                 microcode::create_DATATRANSFER__REG_ASGN_DEREF_INV_REG(
-                        uint128_t::size() / 2ULL,
+                        (uint8_t)(uint128_t::size() / 2ULL),
                         re.get_register_operand(0U,D).first + uint128_t::size() / 2ULL,
                         temp
                         ),
@@ -1006,7 +1007,7 @@ bool  recognition_data::recognise_MOVDQU(recognition_engine const& re, descripto
                         uint128_t::size() / 2ULL
                         ),
                 microcode::create_DATATRANSFER__REG_ASGN_DEREF_INV_REG(
-                        uint128_t::size() / 2ULL,
+                        (uint8_t)(uint128_t::size() / 2ULL),
                         re.get_register_operand(0U,D).first,
                         D.start_address_of_temporaries()
                         ),
@@ -5447,7 +5448,7 @@ bool  recognition_data::recognise_SAR(recognition_engine const& re, descriptor::
                             reg_info.second,
                             D.start_address_of_temporaries(),
                             D.start_address_of_temporaries(),
-                            count
+                            (uint8_t)count
                             ),
                      microcode::create_INTEGERARITHMETICS__REG_ASGN_REG_PLUS_NUMBER(
                              reg_info.second,
@@ -5464,7 +5465,7 @@ bool  recognition_data::recognise_SAR(recognition_engine const& re, descriptor::
                              reg_info.second,
                              reg_info.first,
                              reg_info.first,
-                             count
+                             (uint8_t)count
                              ),
                      microcode::create_BITOPERATIONS__REG_ASGN_REG_OR_REG(
                              reg_info.second,
@@ -5756,7 +5757,7 @@ bool  recognition_data::recognise_SHR(recognition_engine const& re, descriptor::
                             reg_info.second,
                             reg_info.first,
                             reg_info.first,
-                            count
+                            (uint8_t)count
                             ),
                      microcode::create_MISCELLANEOUS__REG_ASGN_PARITY_REG(
                             1U,
@@ -5857,7 +5858,7 @@ bool  recognition_data::recognise_SHL(recognition_engine const& re, descriptor::
                              reg_info.second,
                              reg_info.first,
                              reg_info.first,
-                             count
+                             (uint8_t)count
                              ),
                      microcode::create_MISCELLANEOUS__REG_ASGN_PARITY_REG(
                              1U,
@@ -5961,13 +5962,13 @@ bool  recognition_data::recognise_ROL(recognition_engine const& re, descriptor::
                              reg_info.second,
                              D.start_address_of_temporaries(),
                              reg_info.first,
-                             8ULL * reg_info.second - count
+                             (uint8_t)(8ULL * reg_info.second - count)
                              ),
                      microcode::create_BITOPERATIONS__REG_ASGN_REG_LSHIFT_NUMBER(
                              reg_info.second,
                              reg_info.first,
                              reg_info.first,
-                             count
+                             (uint8_t)count
                              ),
                      microcode::create_BITOPERATIONS__REG_ASGN_REG_OR_REG(
                              reg_info.second,
@@ -6762,7 +6763,7 @@ bool  recognition_data::recognise_PUSH(recognition_engine const& re, descriptor:
                             ~num_bytes + 1ULL
                             ),
                     microcode::create_DATATRANSFER__DEREF_INV_REG_ASGN_NUMBER(
-                            num_bytes,
+                            (uint8_t)num_bytes,
                             get_register_info("rsp",D).first,
                             re.get_immediate_operand(0U)
                             ),

@@ -1,7 +1,7 @@
 #include <rebours/MAL/recogniser/detail/recognition_data.hpp>
-#include <rebours/MAL/recogniser/msgstream.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <rebours/MAL/descriptor/storage.hpp>
 
 namespace mal { namespace recogniser { namespace detail {
@@ -23,13 +23,13 @@ recognition_data::recognition_data(uint64_t const  start_address, reg_fn_type co
     , m_buffer()
 {}
 
-void  recognition_data::set_error_result(uint8_t const  value) noexcept
+void  recognition_data::set_error_result(uint8_t const  value)
 {
     ASSUMPTION(value == 1U || value == 2U || value == 4U || value == 254U || value == 255U);
     m_error_result = value;
 }
 
-void  recognition_data::set_error_rights(uint8_t const  value) noexcept
+void  recognition_data::set_error_rights(uint8_t const  value)
 {
     ASSUMPTION(value == 1U || value == 2U);
     m_error_rights = value;

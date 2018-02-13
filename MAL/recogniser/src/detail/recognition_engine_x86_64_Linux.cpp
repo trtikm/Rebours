@@ -1,8 +1,8 @@
 #include <rebours/MAL/recogniser/detail/recognition_engine_x86_64_Linux.hpp>
-#include <rebours/MAL/recogniser/msgstream.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
-#include <rebours/MAL/recogniser/development.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
 #include <rebours/MAL/descriptor/storage.hpp>
 #include <string>
 
@@ -109,8 +109,9 @@ bool  recognition_engine::is_immediate_operand(uint8_t const  idx) const
 
 bool  recognition_engine::is_floating_point_operand(uint8_t const  idx) const
 {
-    ASSUMPTION(idx < num_operands());
-    return details().operands[idx].type == X86_OP_FP;
+//    ASSUMPTION(idx < num_operands());
+//    return details().operands[idx].type == X86_OP_FP;
+    return false;   // It looks like Capstone removed this flag from 'x86_op_type' structure.
 }
 
 bool  recognition_engine::is_read_operand(uint8_t const  idx) const
@@ -181,8 +182,9 @@ int64_t  recognition_engine::get_immediate_operand(uint8_t const  idx) const
 
 double  recognition_engine::get_floating_point_operand(uint8_t const  idx) const
 {
-    ASSUMPTION(idx < num_operands() && is_floating_point_operand(idx));
-    return details().operands[idx].fp;
+//    ASSUMPTION(idx < num_operands() && is_floating_point_operand(idx));
+//    return details().operands[idx].fp;
+    UNREACHABLE();  // It looks like Capstone removed this flag from 'x86_op_type' structure.
 }
 
 

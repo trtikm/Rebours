@@ -45,7 +45,7 @@ T  num(uint8_t const*  data, uint8_t const  size, bool const  are_data_in_big_en
 template<typename T>
 T  num(std::vector<uint8_t> const&  data, bool const  are_data_in_big_endian = true)
 {
-    return num<T>(data.data(),data.size(),are_data_in_big_endian);
+    return num<T>(data.data(),(uint8_t)data.size(),are_data_in_big_endian);
 }
 
 ret_type  read_register(std::string const&  reg_name, descriptor::storage const&  D, reg_fn_type const&  reg_fn, std::vector<uint8_t>&  buffer);

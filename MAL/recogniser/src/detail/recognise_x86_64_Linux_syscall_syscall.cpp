@@ -11,15 +11,16 @@ namespace osabi {
 
 
 using  dev_t = uint64_t;          //!< ASSERT: sizeof(dev_t)==8
-using  ino_t = unsigned long;     //!< ASSERT: sizeof(ino_t)==8
+using  ino_t = uint64_t;          //!< ASSERT: sizeof(ino_t)==8
 using  mode_t = uint32_t;         //!< ASSERT: sizeof(mode_t)==4
-using  nlink_t = unsigned long;   //!< ASSERT: sizeof(nlink_t)==8
+using  nlink_t = uint64_t;        //!< ASSERT: sizeof(nlink_t)==8
 using  uid_t = uint32_t;          //!< ASSERT: sizeof(uid_t)==4
 using  gid_t = uint32_t;          //!< ASSERT: sizeof(gid_t)==4
-using  off_t = long;              //!< ASSERT: sizeof(off_t)==8
-using  blksize_t = long;          //!< ASSERT: sizeof(blksize_t)==8
-using  syscall_slong_t = long;    //!< ASSERT: sizeof(syscall_slong_t)==8
-using  time_t = long;             //!< ASSERT: sizeof(time_t)==8
+using  off_t = int64_t;           //!< ASSERT: sizeof(off_t)==8
+using  blksize_t = int64_t;       //!< ASSERT: sizeof(blksize_t)==8
+using  blkcnt_t = uint64_t;
+using  syscall_slong_t = int64_t; //!< ASSERT: sizeof(syscall_slong_t)==8
+using  time_t = int64_t;          //!< ASSERT: sizeof(time_t)==8
 
 static_assert(sizeof(dev_t) == 8ULL,"It must match the size of the corresponding type used on Linux.");
 static_assert(sizeof(ino_t) == 8ULL,"It must match the size of the corresponding type used on Linux.");

@@ -24,7 +24,7 @@ struct  recognition_engine
     uint8_t  get_rex() const { return details().rex; }
     bool  uses_rex() const { return get_rex() != 0U; }
 
-    uint8_t  num_bytes_of_instruction() const { return instruction().size; }
+    uint8_t  num_bytes_of_instruction() const { return (uint8_t)instruction().size; }
     uint8_t  get_byte_of_instruction(uint8_t const  idx) const;
 
     uint8_t  get_address_size() const { return details().addr_size; }

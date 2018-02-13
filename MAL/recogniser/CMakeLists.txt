@@ -22,14 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
@@ -83,6 +84,15 @@ set(PROGRAM_INCLUDE_DIR "${PROGRAM_ROOT}/include")
 include_directories(${PROGRAM_INCLUDE_DIR})
 
 
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 # Handling the dependence to 'Capstone-next' 3rd library.
 if(NOT DEFINED CAPSTONE_NEXT_ROOT)
     set(CAPSTONE_NEXT_ROOT "Specify Capstone-next's installation directory." CACHE STRING "Specify Capstone-next's installation directory." FORCE)
@@ -95,15 +105,6 @@ include_directories(${CAPSTONE_NEXT_INCLUDE_DIR})
 find_package(Threads)
 
 add_library(recogniser
-    ./include/rebours/MAL/recogniser/assumptions.hpp
-    ./include/rebours/MAL/recogniser/invariants.hpp
-    ./include/rebours/MAL/recogniser/endian.hpp
-    ./include/rebours/MAL/recogniser/msgstream.hpp
-    ./include/rebours/MAL/recogniser/test.hpp
-    ./include/rebours/MAL/recogniser/development.hpp
-    ./include/rebours/MAL/recogniser/file_utils.hpp
-    ./src/file_utils.cpp
-
     ./include/rebours/MAL/recogniser/detail/recognition_data.hpp
     ./src/detail/recognition_data.cpp
     ./include/rebours/MAL/recogniser/detail/register_info.hpp

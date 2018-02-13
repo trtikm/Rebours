@@ -1,7 +1,7 @@
 #include <rebours/MAL/recogniser/detail/recognise_x86_64_Linux_syscall_utils.hpp>
 #include <rebours/MAL/recogniser/detail/register_info.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 
 namespace mal { namespace recogniser { namespace detail { namespace x86_64_Linux { namespace syscall {
 

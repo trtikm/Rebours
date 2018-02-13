@@ -1,9 +1,9 @@
 #include <rebours/MAL/recogniser/detail/recognise_x86_64_Linux.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
-#include <rebours/MAL/recogniser/msgstream.hpp>
-#include <rebours/MAL/recogniser/development.hpp>
-#include <rebours/MAL/recogniser/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/development.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <capstone/capstone.h>
 #include <capstone/x86.h>
 #include <fstream>
@@ -55,7 +55,7 @@ bool  recognition_data::dump(std::string const&  dump_file_pathname) const
         ostr << "<p>"
                 "ERROR: cannot open the capstone-next library ('cs_open' has FAILED)."
                 "</p>\n</body>\n</html>\n";
-        return ostr;
+        return false;
     }
 
     cs_option(handle, CS_OPT_DETAIL, CS_OPT_ON);
@@ -67,7 +67,7 @@ bool  recognition_data::dump(std::string const&  dump_file_pathname) const
         ostr << "<p>"
                 "ERROR: Cannot diassemly the instruction ('cs_disasm' has FAILED)."
                 "</p>\n</body>\n</html>\n";
-        return ostr;
+        return false;
     }
 
     cs_insn const* instr = &(insn[0ULL]);
@@ -78,7 +78,7 @@ bool  recognition_data::dump(std::string const&  dump_file_pathname) const
         ostr << "<p>"
                 "ERROR: Cannot access details of the disassembled instruction."
                 "</p>\n</body>\n</html>\n";
-        return ostr;
+        return false;
     }
 
     cs_x86 const* const  x86 = &(detail->x86);
@@ -273,11 +273,12 @@ bool  recognition_data::dump(std::string const&  dump_file_pathname) const
                             ;
                 }
                 break;
-            case X86_OP_FP:
-                ostr << "<td>FP</td>\n"
-                        "<td></td>\n"
-                        "<td>"<< op->fp << "</td>\n";
-                break;
+// It looks like X86_OP_FP was removed from Capstone for X86 platform.
+//            case X86_OP_FP:
+//                ostr << "<td>FP</td>\n"
+//                        "<td></td>\n"
+//                        "<td>"<< op->fp << "</td>\n";
+//                break;
             default:
                 ostr << "<td>INVALID</td>\n";
                 break;

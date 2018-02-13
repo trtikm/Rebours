@@ -35,9 +35,9 @@ struct recognition_data
 
     void  set_asm_text(std::string const&  value) { m_asm_text = value; }
     void  set_asm_bytes(std::string const&  value) { m_asm_bytes = value; }
-    void  set_error_result(uint8_t const  value) noexcept;
+    void  set_error_result(uint8_t const  value);
     void  set_error_address(uint64_t const  value) noexcept { m_error_address = value; }
-    void  set_error_rights(uint8_t const  value) noexcept;
+    void  set_error_rights(uint8_t const  value);
     std::vector<uint8_t>&  buffer() { return m_buffer; }
 
 private:

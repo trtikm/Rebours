@@ -1,7 +1,7 @@
 #include <rebours/MAL/recogniser/recognise.hpp>
-#include <rebours/MAL/recogniser/msgstream.hpp>
-#include <rebours/MAL/recogniser/assumptions.hpp>
-#include <rebours/MAL/recogniser/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <rebours/MAL/recogniser/detail/recognition_data.hpp>
 #include <rebours/MAL/descriptor/storage.hpp>
 
