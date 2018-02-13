@@ -1,7 +1,7 @@
 #include <rebours/analysis/native_execution/execution_properties.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/development.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/development.hpp>
 #include <limits>
 //#include <mutex>
 

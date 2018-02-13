@@ -2,9 +2,9 @@
 #include <rebours/analysis/native_execution/execute_program.hpp>
 #include <rebours/analysis/native_execution/exploration.hpp>
 #include <rebours/analysis/native_execution/dump.hpp>
-#include <rebours/analysis/native_execution/msgstream.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 
 namespace analysis { namespace natexe {
 

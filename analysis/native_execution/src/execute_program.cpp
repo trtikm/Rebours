@@ -1,10 +1,10 @@
 #include <rebours/analysis/native_execution/execute_program.hpp>
 #include <rebours/analysis/native_execution/execute_instruction.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
-#include <rebours/analysis/native_execution/development.hpp>
-#include <rebours/analysis/native_execution/msgstream.hpp>
-#include <rebours/analysis/native_execution/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <rebours/analysis/native_execution/dump.hpp>
 #include <rebours/program/assembly.hpp>
 #include <algorithm>
@@ -826,4 +826,3 @@ std::string  perform_single_native_program_execution(
 
 
 }}
-

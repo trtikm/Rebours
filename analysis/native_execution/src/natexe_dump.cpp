@@ -1,10 +1,10 @@
 #include <rebours/analysis/native_execution/dump.hpp>
-#include <rebours/analysis/native_execution/file_utils.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <rebours/analysis/native_execution/execution_properties.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
-#include <rebours/analysis/native_execution/msgstream.hpp>
-#include <rebours/analysis/native_execution/development.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/development.hpp>
 #include <rebours/program/assembly.hpp>
 #include <map>
 #include <set>
@@ -13,6 +13,7 @@
 #include <iomanip>
 #include <fstream>
 #include <tuple>
+#include <cctype>
 
 namespace analysis { namespace natexe { namespace detail {
 
@@ -115,10 +116,7 @@ dump_push_guard::dump_push_guard(std::string const&  new_dir, bool const  allow_
 dump_push_guard::~dump_push_guard()
 {
     if (dump_enabled() && !dir().empty())
-    {
-        ASSUMPTION(dump_directory() == dir());
         dump_pop_directory();
-    }
 }
 
 
@@ -350,7 +348,7 @@ std::string  dump_content_of_registers(memory_content const&  content,
         ostr << "    <td>" << reg_name << "</td>\n";
         ostr << "    <td>" << std::hex << std::setw(2ULL * reg_size) << std::setfill('0');
         if (reg_size <= sizeof(uint64_t))
-            ostr << memory_read<uint64_t>(content,adr_begin,reg_size,true);
+            ostr << memory_read<uint64_t>(content,adr_begin,(byte)reg_size,true);
         else
             ostr << memory_read<uint128_t>(content,adr_begin,true);
         ostr << "</td>\n";

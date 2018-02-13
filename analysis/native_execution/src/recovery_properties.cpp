@@ -1,7 +1,7 @@
 #include <rebours/analysis/native_execution/recovery_properties.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/development.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/development.hpp>
 #include <limits>
 //#include <mutex>
 
@@ -71,7 +71,7 @@ node_id  add_case_to_switch(microcode::program_component&  C, switch_info&  info
             microcode::instruction const  succ_instr = C.instruction({info.default_node(),succ_node});
             ASSUMPTION(succ_instr.GIK() == microcode::GIK::HAVOC__REG_ASGN_HAVOC && C.successors(succ_node).empty());
             ASSUMPTION(succ_instr.argument<uint64_t>(1ULL) == tmp_begin);
-            num_bytes = std::max(succ_instr.argument<uint64_t>(0ULL),8UL);
+            num_bytes = std::max(succ_instr.argument<uint64_t>(0ULL),(uint64_t)8UL);
             erased = succ_node;
             C.erase_nodes({succ_node});
         }

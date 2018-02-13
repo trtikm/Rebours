@@ -22,14 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
@@ -65,6 +66,9 @@ if(NOT DEFINED PROGRAM_ROOT)
 endif()
 set(PROGRAM_INCLUDE_DIR "${PROGRAM_ROOT}/include")
 include_directories(${PROGRAM_INCLUDE_DIR})
+link_directories(
+    "${PROGRAM_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
 
 
 # Handling the dependence to 'MAL/recogniser' library.
@@ -73,6 +77,9 @@ if(NOT DEFINED RECOGNISER_ROOT)
 endif()
 set(RECOGNISER_INCLUDE_DIR "${RECOGNISER_ROOT}/include")
 include_directories(${RECOGNISER_INCLUDE_DIR})
+link_directories(
+    "${RECOGNISER_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
 
 
 # Handling the dependence to 'bitvectors' library.
@@ -81,25 +88,26 @@ if(NOT DEFINED BITVECTORS_ROOT)
 endif()
 set(BITVECTORS_INCLUDE_DIR "${BITVECTORS_ROOT}/include")
 include_directories(${BITVECTORS_INCLUDE_DIR})
-if(NOT DEFINED REBOURS_GLOBAL_BUILD)
-    add_subdirectory("${BITVECTORS_ROOT}"  "bitvectors")
-endif()
+#if(NOT DEFINED REBOURS_GLOBAL_BUILD)
+#    add_subdirectory("${BITVECTORS_ROOT}"  "bitvectors")
+#endif()
+link_directories(
+    "${BITVECTORS_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
 
+
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
 
 find_package(Threads)
 
 
 add_library(native_execution
-    ./include/rebours/analysis/native_execution/assumptions.hpp
-    ./include/rebours/analysis/native_execution/invariants.hpp
-    ./include/rebours/analysis/native_execution/endian.hpp
-    ./include/rebours/analysis/native_execution/msgstream.hpp
-    ./include/rebours/analysis/native_execution/test.hpp
-    ./include/rebours/analysis/native_execution/development.hpp
-    ./include/rebours/analysis/native_execution/std_pair_hash.hpp
-
-    ./include/rebours/analysis/native_execution/file_utils.hpp
-    ./src/file_utils.cpp
     ./include/rebours/analysis/native_execution/dump.hpp
     ./src/natexe_dump.cpp
 

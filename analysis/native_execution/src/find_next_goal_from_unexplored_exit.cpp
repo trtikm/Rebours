@@ -1,8 +1,8 @@
 #include <rebours/analysis/native_execution/exploration.hpp>
-#include <rebours/analysis/native_execution/msgstream.hpp>
-#include <rebours/analysis/native_execution/assumptions.hpp>
-#include <rebours/analysis/native_execution/invariants.hpp>
-#include <rebours/analysis/native_execution/development.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
 #include <deque>
 
 namespace analysis { namespace natexe {
@@ -28,8 +28,8 @@ std::string  find_next_goal_from_unexplored_exit(microcode::program const&  prog
         std::vector<node_id> const&  succ = C.successors(u);
         if (succ.size() == 2ULL)
         {
-            bool const  uf = rprops.visited_branchings().count({u,succ.front()});
-            bool const  ub = rprops.visited_branchings().count({u,succ.back()});
+            bool const  uf = rprops.visited_branchings().count({u,succ.front()}) != 0UL;
+            bool const  ub = rprops.visited_branchings().count({u,succ.back()}) != 0UL;
             if (uf && !ub)
             {
                 next_goal = {u,succ.back()};

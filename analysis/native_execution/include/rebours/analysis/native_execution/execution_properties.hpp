@@ -1,11 +1,11 @@
 #ifndef REBOURS_ANALYSIS_NATIVE_EXECUTION_EXECUTION_PROPERTIES_HPP_INCLUDED
 #   define REBOURS_ANALYSIS_NATIVE_EXECUTION_EXECUTION_PROPERTIES_HPP_INCLUDED
 
-#   include <rebours/analysis/native_execution/endian.hpp>
-#   include <rebours/analysis/native_execution/invariants.hpp>
-#   include <rebours/analysis/native_execution/assumptions.hpp>
-#   include <rebours/analysis/native_execution/development.hpp>
-#   include <rebours/analysis/native_execution/std_pair_hash.hpp>
+#   include <rebours/utility/endian.hpp>
+#   include <rebours/utility/invariants.hpp>
+#   include <rebours/utility/assumptions.hpp>
+#   include <rebours/utility/development.hpp>
+#   include <rebours/utility/std_pair_hash.hpp>
 #   include <rebours/program/program.hpp>
 #   include <memory>
 #   include <vector>
@@ -228,7 +228,7 @@ template<typename T>
 T  memory_read(memory_content const&  content, address const  begin, bool const  are_data_in_big_endian = true,
                typename std::conditional<sizeof(T) <= sizeof(uint64_t),void,T*>::type = nullptr)
 {
-    static_assert(std::is_same<T,uint128_t>::value || std::is_same<T,float80_t>::value,"We support only read of int128_t and float80_t types.");
+    static_assert(std::is_same<T,uint128_t>::value || std::is_same<T,float80_type>::value,"We support only read of int128_t and float80_type types.");
     T  result;
     byte*  b = result.data();
     memory_read(content,begin,b,result.size());

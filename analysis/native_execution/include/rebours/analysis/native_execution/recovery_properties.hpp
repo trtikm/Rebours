@@ -2,7 +2,7 @@
 #   define REBOURS_ANALYSIS_NATIVE_EXECUTION_RECOVERY_PROPERTIES_HPP_INCLUDED
 
 #   include <rebours/analysis/native_execution/execution_properties.hpp>
-#   include <rebours/analysis/native_execution/std_pair_hash.hpp>
+#   include <rebours/utility/std_pair_hash.hpp>
 #   include <rebours/program/program.hpp>
 #   include <unordered_map>
 #   include <unordered_set>
