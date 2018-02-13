@@ -83,17 +83,19 @@ set(PROGRAM_INCLUDE_DIR "${PROGRAM_ROOT}/include")
 include_directories(${PROGRAM_INCLUDE_DIR})
 
 
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 find_package(Threads)
 
 
 add_library(reloader
-    ./include/rebours/MAL/reloader/assumptions.hpp
-    ./include/rebours/MAL/reloader/invariants.hpp
-    ./include/rebours/MAL/reloader/endian.hpp
-    ./include/rebours/MAL/reloader/msgstream.hpp
-    ./include/rebours/MAL/reloader/test.hpp
-    ./include/rebours/MAL/reloader/development.hpp
-
     ./include/rebours/MAL/reloader/reload.hpp
     ./src/reload.cpp
     )

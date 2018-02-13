@@ -1,6 +1,6 @@
 #include <rebours/MAL/reloader/reload.hpp>
-#include <rebours/MAL/reloader/assumptions.hpp>
-#include <rebours/MAL/reloader/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 
 namespace mal { namespace reloader {
 
