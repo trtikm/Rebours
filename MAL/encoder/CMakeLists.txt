@@ -59,6 +59,24 @@ include_directories(
     )
 
 
+set(REBOURS_PROGRAM_ROOT "${PROJECT_SOURCE_DIR}/../../program" CACHE STRING "Specify path to the 'program' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_PROGRAM_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_PROGRAM_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 # Handling the dependence to 'loader' library.
 if(NOT DEFINED LOADER_ROOT)
     set(LOADER_ROOT "${PROJECT_SOURCE_DIR}/../loader" CACHE STRING "Install path to the 'MAL/loader' library." FORCE)
@@ -87,13 +105,6 @@ find_package(Threads)
 
 
 add_library(encoder
-    ./include/rebours/MAL/encoder/assumptions.hpp
-    ./include/rebours/MAL/encoder/invariants.hpp
-    ./include/rebours/MAL/encoder/endian.hpp
-    ./include/rebours/MAL/encoder/msgstream.hpp
-    ./include/rebours/MAL/encoder/test.hpp
-    ./include/rebours/MAL/encoder/development.hpp
-
     ./include/rebours/MAL/encoder/encode.hpp
     ./src/encode.cpp
     )

@@ -1,7 +1,7 @@
 #include <rebours/MAL/encoder/encode.hpp>
-#include <rebours/MAL/encoder/assumptions.hpp>
-#include <rebours/MAL/encoder/invariants.hpp>
-#include <rebours/MAL/encoder/development.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
 #include <iostream>
 
 namespace mal { namespace encoder {
