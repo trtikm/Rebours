@@ -1,9 +1,8 @@
 #include <rebours/MAL/prologue/builder.hpp>
-#include <rebours/MAL/prologue/assumptions.hpp>
-#include <rebours/MAL/prologue/invariants.hpp>
-#include <rebours/MAL/prologue/msgstream.hpp>
-#include <rebours/MAL/prologue/development.hpp>
-#include <rebours/MAL/prologue/development.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/development.hpp>
 #include <algorithm>
 
 namespace mal { namespace prologue { namespace detail { namespace x86_64_Linux { namespace {

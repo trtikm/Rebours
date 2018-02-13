@@ -1,6 +1,6 @@
 #include <rebours/MAL/prologue/builder.hpp>
-#include <rebours/MAL/prologue/assumptions.hpp>
-#include <rebours/MAL/prologue/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 
 namespace mal { namespace prologue { namespace detail {
 

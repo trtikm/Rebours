@@ -22,14 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
@@ -56,6 +57,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 include_directories(
     "${PROJECT_SOURCE_DIR}/include"
+    )
+
+
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
     )
 
 
@@ -87,13 +97,6 @@ find_package(Threads)
 
 
 add_library(prologue
-    ./include/rebours/MAL/prologue/assumptions.hpp
-    ./include/rebours/MAL/prologue/invariants.hpp
-    ./include/rebours/MAL/prologue/endian.hpp
-    ./include/rebours/MAL/prologue/msgstream.hpp
-    ./include/rebours/MAL/prologue/test.hpp
-    ./include/rebours/MAL/prologue/development.hpp
-
     ./include/rebours/MAL/prologue/builder.hpp
     ./src/builder.cpp
     ./src/builder_x86_64_Linux.cpp
