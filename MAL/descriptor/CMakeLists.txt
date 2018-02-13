@@ -66,19 +66,19 @@ set(LOADER_INCLUDE_DIR "${LOADER_ROOT}/include")
 include_directories(${LOADER_INCLUDE_DIR})
 
 
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 find_package(Threads)
 
 
 add_library(descriptor
-    ./include/rebours/MAL/descriptor/assumptions.hpp
-    ./include/rebours/MAL/descriptor/invariants.hpp
-    ./include/rebours/MAL/descriptor/endian.hpp
-    ./include/rebours/MAL/descriptor/msgstream.hpp
-    ./include/rebours/MAL/descriptor/test.hpp
-    ./include/rebours/MAL/descriptor/development.hpp
-    ./include/rebours/MAL/descriptor/file_utils.hpp
-    ./src/file_utils.cpp
-
     ./include/rebours/MAL/descriptor/storage.hpp
     ./src/storage.cpp
     ./src/x86_64_Linux/build_register_maps.cpp

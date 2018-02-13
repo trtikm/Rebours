@@ -1,10 +1,10 @@
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/descriptor/file_utils.hpp>
-#include <rebours/MAL/descriptor/msgstream.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
-#include <rebours/MAL/descriptor/invariants.hpp>
-#include <rebours/MAL/descriptor/development.hpp>
-#include <rebours/MAL/descriptor/endian.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
+#include <rebours/utility/endian.hpp>
 #include <unordered_set>
 #include <algorithm>
 

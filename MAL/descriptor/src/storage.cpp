@@ -1,8 +1,8 @@
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/descriptor/msgstream.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
-#include <rebours/MAL/descriptor/invariants.hpp>
-#include <rebours/MAL/descriptor/endian.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/endian.hpp>
 #include <algorithm>
 #include <utility>
 
@@ -93,11 +93,11 @@ namespace mal { namespace descriptor {
 
 void  linearise(stack_init_data const&  sid, std::vector<uint8_t>&  output)
 {
-    detail::linearise(output,sid.first.size());
+    detail::linearise(output,(uint32_t)sid.first.size());
     for (std::string const& s : sid.first)
         detail::linearise(output,s);
 
-    detail::linearise(output,sid.second.size());
+    detail::linearise(output,(uint32_t)sid.second.size());
     for (std::pair<std::string,std::string> const& name_value : sid.second)
     {
         detail::linearise(output,name_value.first);

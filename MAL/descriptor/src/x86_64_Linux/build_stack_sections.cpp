@@ -1,5 +1,5 @@
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
+#include <rebours/utility/assumptions.hpp>
 
 namespace mal { namespace descriptor { namespace detail { namespace x86_64_Linux {
 

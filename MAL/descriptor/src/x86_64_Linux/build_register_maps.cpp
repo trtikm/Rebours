@@ -1,8 +1,8 @@
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/descriptor/msgstream.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
-#include <rebours/MAL/descriptor/invariants.hpp>
-#include <rebours/MAL/descriptor/development.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
 
 namespace mal { namespace descriptor { namespace detail {
 std::map<address_range,std::string>  invert_registers_to_ranges(std::unordered_map<std::string,address_range> const&  registers_to_ranges);

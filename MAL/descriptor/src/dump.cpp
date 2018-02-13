@@ -1,15 +1,17 @@
 #include <rebours/MAL/descriptor/dump.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
-#include <rebours/MAL/descriptor/invariants.hpp>
-#include <rebours/MAL/descriptor/msgstream.hpp>
 #include <rebours/MAL/loader/dump.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/config.hpp>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <map>
 
 #include <algorithm>
-//#include <cctype>
+#include <cctype>
 //#include <cstdlib>
 //#include <iomanip>
 //#include <set>
@@ -271,7 +273,7 @@ void dump_default_stack_init_data(stack_init_data const&  data, std::string cons
 
 void  dump_registers_mapping(std::unordered_map<std::string,address_range> const&  mapping, std::string const&  root_dir)
 {
-    std::fstream  ostr(concatenate_file_paths(root_dir,registers_mapping_relative_pathname), std::ios_base::out);
+    std::fstream  ostr(fileutl::concatenate_file_paths(root_dir,registers_mapping_relative_pathname), std::ios_base::out);
     ASSUMPTION(ostr.is_open());
 
     dump_html_prolog(ostr);
@@ -354,24 +356,24 @@ void  dump_html(storage const&  data, std::string const&  output_file_pathname)
         ostr << "    <td>" << data.tls_template_offset() << "</td>\n";
         ostr << "  </tr>\n";
 
-        std::string const  abs_path = concatenate_file_paths(parse_path_in_pathname(output_file_pathname),tls_relative_path);
-        create_directory(abs_path);
+        std::string const  abs_path = fileutl::concatenate_file_paths(fileutl::parse_path_in_pathname(output_file_pathname),tls_relative_path);
+        fileutl::create_directory(abs_path);
 
         {
             std::string const  filename = "tls_template_relocations.html";
-            dump_tls_template_relocations(data.tls_template_relocations(),concatenate_file_paths(abs_path,filename));
+            dump_tls_template_relocations(data.tls_template_relocations(),fileutl::concatenate_file_paths(abs_path,filename));
             ostr << "  <tr>\n";
             ostr << "    <td>TLS template relocations</td>\n";
-            ostr << "    <td><a href=\"" << concatenate_file_paths(tls_relative_path,filename) << "\">here</a></td>\n";
+            ostr << "    <td><a href=\"" << fileutl::concatenate_file_paths(tls_relative_path,filename) << "\">here</a></td>\n";
             ostr << "  </tr>\n";
         }
 
         {
             std::string const  filename = "tls_template_content.html";
-            dump_tls_template_content(data.tls_template_content(),concatenate_file_paths(abs_path,filename));
+            dump_tls_template_content(data.tls_template_content(),fileutl::concatenate_file_paths(abs_path,filename));
             ostr << "  <tr>\n";
             ostr << "    <td>TLS template bytes</td>\n";
-            ostr << "    <td><a href=\"" << concatenate_file_paths(tls_relative_path,filename) << "\">here</a></td>\n";
+            ostr << "    <td><a href=\"" << fileutl::concatenate_file_paths(tls_relative_path,filename) << "\">here</a></td>\n";
             ostr << "  </tr>\n";
         }
     }
@@ -380,18 +382,18 @@ void  dump_html(storage const&  data, std::string const&  output_file_pathname)
     ostr << "    <td>" << std::hex << data.heap_start() <<  "</td>\n";
     ostr << "  </tr>\n";
     {
-        std::string const  abs_path = parse_path_in_pathname(output_file_pathname);
+        std::string const  abs_path = fileutl::parse_path_in_pathname(output_file_pathname);
         std::string const  filename = "stack_sections.html";
-        dump_stack_sections(data.stack_sections(),concatenate_file_paths(abs_path,filename));
+        dump_stack_sections(data.stack_sections(),fileutl::concatenate_file_paths(abs_path,filename));
         ostr << "  <tr>\n";
         ostr << "    <td>List of stack sections</td>\n";
         ostr << "    <td><a href=\"./" << filename << "\">here</a></td>\n";
         ostr << "  </tr>\n";
     }
     {
-        std::string const  abs_path = parse_path_in_pathname(output_file_pathname);
+        std::string const  abs_path = fileutl::parse_path_in_pathname(output_file_pathname);
         std::string const  filename = "stack_initial_data.html";
-        dump_default_stack_init_data(data.default_stack_init_data(),concatenate_file_paths(abs_path,filename));
+        dump_default_stack_init_data(data.default_stack_init_data(),fileutl::concatenate_file_paths(abs_path,filename));
         ostr << "  <tr>\n";
         ostr << "    <td>Default stack init data</td>\n";
         ostr << "    <td><a href=\"./" << filename << "\">here</a></td>\n";
@@ -422,11 +424,11 @@ void  dump_html(storage const&  data,
                 bool const  dump_also_contents_of_sections
                 )
 {
-    std::string const  root_dir = parse_path_in_pathname(output_file_pathname);
-    create_directory(parse_path_in_pathname(output_file_pathname));
+    std::string const  root_dir = fileutl::parse_path_in_pathname(output_file_pathname);
+    fileutl::create_directory(fileutl::parse_path_in_pathname(output_file_pathname));
     if (data.file_descriptor().operator bool())
     {
-        std::string const  file_descriptor_root_file = concatenate_file_paths(root_dir,detail::file_data_relative_pathname);
+        std::string const  file_descriptor_root_file = fileutl::concatenate_file_paths(root_dir,detail::file_data_relative_pathname);
         loader::dump_html(data.file_descriptor(),file_descriptor_root_file,dump_also_contents_of_sections);
     }
     detail::dump_registers_mapping(data.registers_to_ranges(),root_dir);
@@ -438,11 +440,11 @@ void  dump_html(storage const&  data,
                 std::vector<loader::address> const&  start_addresses_of_sections_whose_content_should_be_dumped
                 )
 {
-    std::string const  root_dir = parse_path_in_pathname(output_file_pathname);
-    create_directory(parse_path_in_pathname(output_file_pathname));
+    std::string const  root_dir = fileutl::parse_path_in_pathname(output_file_pathname);
+    fileutl::create_directory(fileutl::parse_path_in_pathname(output_file_pathname));
     if (data.file_descriptor().operator bool())
     {
-        std::string const  file_descriptor_root_file = concatenate_file_paths(root_dir,detail::file_data_relative_pathname);
+        std::string const  file_descriptor_root_file = fileutl::concatenate_file_paths(root_dir,detail::file_data_relative_pathname);
         loader::dump_html(data.file_descriptor(),file_descriptor_root_file,start_addresses_of_sections_whose_content_should_be_dumped);
     }
     detail::dump_registers_mapping(data.registers_to_ranges(),root_dir);

@@ -1,11 +1,17 @@
 #include <rebours/MAL/descriptor/storage.hpp>
-#include <rebours/MAL/descriptor/assumptions.hpp>
-#include <rebours/MAL/descriptor/invariants.hpp>
-#include <rebours/MAL/descriptor/endian.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/endian.hpp>
+#include <rebours/utility/config.hpp>
 #include <vector>
 #include <utility>
 #include <algorithm>
 #include <iterator>
+#if PLATFORM() == PLATFORM_WINDOWS()
+#   include <rebours/utility/large_types.hpp>
+#   pragma warning(disable : 4200)
+#endif
+
 
 namespace {
 
@@ -72,7 +78,15 @@ typedef struct
   void *__private_ss;
   long int __glibc_reserved2;
   /* Have space for the post-AVX register size.  */
+#if PLATFORM() == PLATFORM_LINUX()
   __128bits rtld_savespace_sse[8][4] __attribute__ ((aligned (32)));
+#elif PLATFORM() == PLATFORM_WINDOWS()
+  uint128_t rtld_savespace_sse[8][4];
+#elif PLATFORM() == PLATFORM_WINDOWS()
+#   error "Support of Linux TLS section is not implemented on MacOS build of Rebours."
+#else
+#   error "Unsupported platform"
+#endif
 
   void *__padding[8];
 } tcbhead_t;
@@ -105,10 +119,26 @@ struct pthread
 
   /* Thread ID - which is also a 'is this thread descriptor (and
      therefore stack) used' flag.  */
+#if PLATFORM() == PLATFORM_LINUX()
   pid_t tid;
+#elif PLATFORM() == PLATFORM_WINDOWS()
+  uint64_t tid;
+#elif PLATFORM() == PLATFORM_WINDOWS()
+#   error "Support of Linux TLS section is not implemented on MacOS build of Rebours."
+#else
+#   error "Unsupported platform"
+#endif
 
   /* Process ID - thread group ID in kernel speak.  */
+#if PLATFORM() == PLATFORM_LINUX()
   pid_t pid;
+#elif PLATFORM() == PLATFORM_WINDOWS()
+  uint64_t pid;
+#elif PLATFORM() == PLATFORM_WINDOWS()
+#   error "Support of Linux TLS section is not implemented on MacOS build of Rebours."
+#else
+#   error "Unsupported platform"
+#endif
 
   /* List of robust mutexes the thread is holding.  */
   void *robust_prev;
@@ -178,7 +208,13 @@ struct pthread
   void *result;
 
   /* Scheduling parameters for the new thread.  */
+#if PLATFORM() == PLATFORM_WINDOWS()
+  struct sched_param {
+      int sched_priority;
+  } schedparam;
+#else
   struct sched_param schedparam;
+#endif
   int schedpolicy;
 
   /* Start position of the code to be executed and the argument passed
