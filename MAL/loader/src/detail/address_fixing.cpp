@@ -1,5 +1,5 @@
 #include <rebours/MAL/loader/detail/address_fixing.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
+#include <rebours/utility/assumptions.hpp>
 
 namespace loader { namespace detail {
 

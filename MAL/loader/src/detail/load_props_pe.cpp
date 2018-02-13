@@ -1,7 +1,7 @@
 #include <rebours/MAL/loader/detail/load_props_pe.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <fstream>
 #include <algorithm>
 

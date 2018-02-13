@@ -3,9 +3,9 @@
 #include <rebours/MAL/loader/detail/address_fixing.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
 #include <rebours/MAL/loader/special_sections/elf_tls.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <algorithm>
 #include <sstream>
 #include <fstream>
@@ -43,17 +43,17 @@ std::string  load_elf_64bit(std::ifstream&  elf,
 
     bool const  is_it_load_of_root_binary = load_props.root_file() == elf_props->path();
 
-    if (file_size(elf_props->path()) < 64ULL)
+    if (fileutl::file_size(elf_props->path()) < 64ULL)
         LOAD_ELF_WARNING("The file is too small to contain even the ELF header.");
 
-    skip_bytes(elf,1U); // We ignore original version.
+    fileutl::skip_bytes(elf,1U); // We ignore original version.
 
     // Load platform props and update elf_props (is it executable or shared library)
 
     bool  is_it_load_of_shared_library;
     {
         abi_t abi;
-        switch (::read_byte(elf))
+        switch (fileutl::read_byte(elf))
         {
 	case 0x00U:
 	    abi = abi_t::UNIX; break;
@@ -65,10 +65,10 @@ std::string  load_elf_64bit(std::ifstream&  elf,
             break;
         }
 
-        skip_bytes(elf,1U); // We ignore abi_version_byte.
-        skip_bytes(elf,7U); // Skip unused bytes.
+        fileutl::skip_bytes(elf,1U); // We ignore abi_version_byte.
+        fileutl::skip_bytes(elf,7U); // Skip unused bytes.
 
-        uint32_t const  file_type = ::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
+        uint32_t const  file_type = fileutl::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
         if (file_type != 2U && file_type != 3U)
             return "[Header offset 0x10] Unknown file type (neither executable nor shared library).";
         is_it_load_of_shared_library = file_type == 3U;
@@ -78,7 +78,7 @@ std::string  load_elf_64bit(std::ifstream&  elf,
 
         architecture_t arch;
         {
-            uint32_t const  arch_id = ::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
+            uint32_t const  arch_id = fileutl::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
             switch (arch_id)
             {
             case 0x3EU:
@@ -100,35 +100,35 @@ std::string  load_elf_64bit(std::ifstream&  elf,
             return "Incompatible platforms of the executable and its shared library: " + elf_props->path();
     }
 
-    skip_bytes(elf,4U);// We do not use the second orig version.
+    fileutl::skip_bytes(elf,4U);// We do not use the second orig version.
 
     // Load of the entry point
-    uint64_t  entry_point = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+    uint64_t  entry_point = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
 
     // Load of sections
-    uint64_t const  program_header_offset = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+    uint64_t const  program_header_offset = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
 
-    skip_bytes(elf,8U); // We do not use section header offset.
-    skip_bytes(elf,4U); // We do not use processor flags.
+    fileutl::skip_bytes(elf,8U); // We do not use section header offset.
+    fileutl::skip_bytes(elf,4U); // We do not use processor flags.
 
     {
-        uint32_t const  elf_header_size = ::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
+        uint32_t const  elf_header_size = fileutl::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
         if (elf_header_size != 64U)
             LOAD_ELF_WARNING("[Header offset 0x34] Wrong size of the ELF header 64bit (have to be 64 bytes). "
                              "We ignore it.");
     }
 
-    uint32_t const  program_header_table_entry_size = ::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
-    uint32_t const  program_header_table_num_entries = ::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
+    uint32_t const  program_header_table_entry_size = fileutl::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
+    uint32_t const  program_header_table_num_entries = fileutl::read_bytes_to_uint32_t(elf,2U,elf_props->is_in_big_endian());
 
-    skip_bytes(elf,2U); // We do not use section header table entry size.
-    skip_bytes(elf,2U); // We do not use section header table num entries.
-    skip_bytes(elf,2U); // We do not use section header table secnames entry_index.
+    fileutl::skip_bytes(elf,2U); // We do not use section header table entry size.
+    fileutl::skip_bytes(elf,2U); // We do not use section header table num entries.
+    fileutl::skip_bytes(elf,2U); // We do not use section header table secnames entry_index.
 
     // Here we are done with reading ELF's header.
     // We continue with reading the program header table.
 
-    if (file_size(elf_props->path()) <
+    if (fileutl::file_size(elf_props->path()) <
             program_header_offset + program_header_table_entry_size * program_header_table_num_entries)
         return "The program header table goes behind the end of the file.";
 
@@ -176,16 +176,16 @@ std::string  load_elf_64bit(std::ifstream&  elf,
     elf.seekg(program_header_offset);
     for (uint32_t  i = 0U; i < program_header_table_num_entries; ++i)
     {
-        uint32_t const  type = ::read_bytes_to_uint32_t(elf,4U,elf_props->is_in_big_endian());
-        uint32_t const  flags = ::read_bytes_to_uint32_t(elf,4U,elf_props->is_in_big_endian());
-        uint64_t const  offset = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
-        uint64_t const  virtual_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+        uint32_t const  type = fileutl::read_bytes_to_uint32_t(elf,4U,elf_props->is_in_big_endian());
+        uint32_t const  flags = fileutl::read_bytes_to_uint32_t(elf,4U,elf_props->is_in_big_endian());
+        uint64_t const  offset = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+        uint64_t const  virtual_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
 
-        skip_bytes(elf,8U); // We do not use physical address.
+        fileutl::skip_bytes(elf,8U); // We do not use physical address.
 
-        uint64_t const  size_in_file = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
-        uint64_t const  size_in_memory = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
-        uint64_t const  align = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+        uint64_t const  size_in_file = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+        uint64_t const  size_in_memory = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+        uint64_t const  align = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
 
         switch (type)
         {
@@ -213,7 +213,7 @@ std::string  load_elf_64bit(std::ifstream&  elf,
                              " has size 0 in the memory. We skip it!");
             continue;
         }
-        if (file_size(elf_props->path()) < offset + size_in_file)
+        if (fileutl::file_size(elf_props->path()) < offset + size_in_file)
             return err_prefix + "goes behind the end of the file.";
         if (offset % align != virtual_address % align)
             LOAD_ELF_WARNING(err_prefix << "has an inconsistency between file and memory alignment.");
@@ -251,93 +251,93 @@ std::string  load_elf_64bit(std::ifstream&  elf,
                 std::ifstream::pos_type const  saved_file_pos = elf.tellg();
                 elf.seekg(offset);
                 while ((uint64_t)elf.tellg() < offset + size_in_file)
-                    switch (::read_bytes_to_int64_t(elf,8U,elf_props->is_in_big_endian()))
+                    switch (fileutl::read_bytes_to_int64_t(elf,8U,elf_props->is_in_big_endian()))
                     {
                     case 1ULL: // We detected NEEDED entry
-                        string_table_offsets.push_back(::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian()));
+                        string_table_offsets.push_back(fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian()));
                         break;
                     case 2ULL: // We detected PLTRELSZ entry
-                        plt_relocations_table_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        plt_relocations_table_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 3ULL: // We detected PLTGOT entry
-                        pltgot_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        pltgot_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 4ULL: // We detected symbol HASH table entry
-                        symbol_hash_table_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        symbol_hash_table_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         symbol_hash_table_type = 4ULL;
                         break;
                     case 5ULL: // We detected STRTAB entry
-                        string_table_file_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        string_table_file_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 6ULL: // We detected SYMTAB entry
-                        symbol_table_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        symbol_table_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 7ULL: // We detected RELA entry
-                        got_relocations_table_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        got_relocations_table_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 8ULL: // We detected RELASZ entry
-                        got_relocations_table_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        got_relocations_table_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 9ULL: // We detected RELAENT entry
-                        got_relocations_table_entry_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        got_relocations_table_entry_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 10ULL: // We detected STRSZ entry
-                        string_table_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        string_table_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 11ULL: // We detected SYMENT entry
-                        symbol_table_entry_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        symbol_table_entry_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 12ULL: // We detected INIT entry
-                        init_fn_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        init_fn_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 13ULL: // We detected FINI entry
-                        fini_fn_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        fini_fn_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 17ULL: // We detected REL entry
                         return "The x86-64bit ELF binary contains '.rela.dyn' REL relocation table type (but RELA is expected).";
                     case 20ULL: // We detected PLTREL entry
-                        plt_relocations_table_type = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        plt_relocations_table_type = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 23ULL: // We detected JMPREL entry
-                        plt_relocations_table_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        plt_relocations_table_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 25ULL: // We detected INIT_ARRAY entry
-                        init_fn_array_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        init_fn_array_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 26ULL: // We detected FINI_ARRAY entry
-                        fini_fn_array_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        fini_fn_array_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 27ULL: // We detected INIT_ARRAYSZ entry
-                        init_fn_array_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        init_fn_array_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 28ULL: // We detected FINI_ARRAYSZ entry
-                        fini_fn_array_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        fini_fn_array_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 30ULL: // We detected FLAGS
                         uses_load_flags = true;
-                        load_flags = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        load_flags = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 32ULL: // We detected PREINIT_ARRAY entry
-                        preinit_fn_array_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        preinit_fn_array_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 33ULL: // We detected PREINIT_ARRAYSZ entry
-                        preinit_fn_array_size = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                        preinit_fn_array_size = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                         break;
                     case 0x6ffffef5ULL: // We detected DT_GNU_HASH entry
                         if (symbol_hash_table_address == 0ULL)
                         {
-                            symbol_hash_table_address = ::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
+                            symbol_hash_table_address = fileutl::read_bytes_to_uint64_t(elf,8U,elf_props->is_in_big_endian());
                             symbol_hash_table_type = 0x6ffffef5ULL;
                         }
                         else
                         {
-                            skip_bytes(elf,8U);
+                            fileutl::skip_bytes(elf,8U);
                             if (symbol_hash_table_type != 4ULL)
                                 return "More than one ABI-specific symbol hash table provided.";
                         }
                         break;
                     default:
-                        skip_bytes(elf,8U);
+                        fileutl::skip_bytes(elf,8U);
                         break;
                     }
                 elf.seekg(saved_file_pos);
@@ -691,17 +691,17 @@ std::string  load_elf_64bit(std::ifstream&  elf,
             return "Cannot read string table at the first given offset.";
         if (shift + orig_pathname.size() >= string_table_size)
             return "The library name passes the end of the symbols table.";
-        std::string const lib_file_name = parse_name_in_pathname(orig_pathname);
+        std::string const lib_file_name = fileutl::parse_name_in_pathname(orig_pathname);
         bool  lib_loaded = false;
         if (std::find(load_props.ignored_files().cbegin(),load_props.ignored_files().cend(),lib_file_name)
                 == load_props.ignored_files().cend())
         {
             for (auto const& search_dir : load_props.search_dirs())
             {
-                std::string const raw_lib_pathname = concatenate_file_paths(search_dir,lib_file_name);
-                if (!file_exists(raw_lib_pathname))
+                std::string const raw_lib_pathname = fileutl::concatenate_file_paths(search_dir,lib_file_name);
+                if (!fileutl::file_exists(raw_lib_pathname))
                     continue;
-                std::string const lib_pathname = normalise_path(absolute_path(raw_lib_pathname));
+                std::string const lib_pathname = fileutl::normalise_path(fileutl::absolute_path(raw_lib_pathname));
                 if (load_props.files_table()->count(lib_pathname) == 0U)
                 {
                     std::string const  err_message = detail::load_elf(lib_pathname,load_props);

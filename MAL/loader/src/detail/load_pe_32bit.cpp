@@ -2,10 +2,10 @@
 #include <rebours/MAL/loader/detail/abi_loaders.hpp>
 #include <rebours/MAL/loader/detail/address_fixing.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/to_string.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/to_string.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <algorithm>
 #include <sstream>
 #include <fstream>
@@ -35,42 +35,42 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
     uint32_t  num_data_directory_entries = 0U;
 
     {
-        image_base = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        image_base = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (image_base > (address)std::numeric_limits<uint32_t>::max())
             return "The image base address cannot be stored in 32bits.";
 
-        section_alignment = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-        file_alignment = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        section_alignment = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        file_alignment = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (file_alignment == 0ULL)
             return "File alignment is zero.";
         if (file_alignment > section_alignment)
             return "File alignment is greater than section alignment.";
 
         set_file_property(pe_props->property_map(),file_properties::os_major_version(),
-                          to_string(read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
         set_file_property(pe_props->property_map(),file_properties::os_minor_version(),
-                          to_string(read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
 
-        skip_bytes(pe,4U); // We do not use neither major nor minor image version.
+        fileutl::skip_bytes(pe,4U); // We do not use neither major nor minor image version.
 
         set_file_property(pe_props->property_map(),file_properties::subsytem_major_version(),
-                          to_string(read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
         set_file_property(pe_props->property_map(),file_properties::subsytem_minor_version(),
-                          to_string(read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())));
 
-        skip_bytes(pe,4U); // Skipping the reserved value.
+        fileutl::skip_bytes(pe,4U); // Skipping the reserved value.
 
-        uint64_t const  size_of_image = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  size_of_image = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (size_of_image % section_alignment != 0ULL)
             return "Size of the loaded binary is not a multiple of section alignment.";
 
-        uint64_t const  size_of_headers = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  size_of_headers = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (size_of_headers % file_alignment != 0ULL)
             return "Size of the file headers is not a multiple of file alignment.";
 
-        skip_bytes(pe,4U); // We do not file's 'check-sum'
+        fileutl::skip_bytes(pe,4U); // We do not file's 'check-sum'
 
-        switch (read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())) // Subsystem type
+        switch (fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian())) // Subsystem type
         {
         case 1U: // Native process (started during OS boot), e.g. a driver
             set_file_property(pe_props->property_map(),file_properties::subsytem(),subsystems::native());
@@ -94,22 +94,22 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
             return "Unknown subsystem type.";
         }
 
-        dll_characteristics = read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian());
+        dll_characteristics = fileutl::read_bytes_to_uint32_t(pe,2U,pe_props->is_in_big_endian());
 
         set_file_property(pe_props->property_map(),file_properties::max_stack_size(),
-                          to_string(read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian())));
 
-        skip_bytes(pe,4U); // We do not use initial (commit) stack size.
+        fileutl::skip_bytes(pe,4U); // We do not use initial (commit) stack size.
 
         set_file_property(pe_props->property_map(),file_properties::max_local_heap_size(),
-                          to_string(read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian())));
+                          to_string(fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian())));
 
-        skip_bytes(pe,4U); // We do not use initial (commit) local heap size.
+        fileutl::skip_bytes(pe,4U); // We do not use initial (commit) local heap size.
 
 
-        skip_bytes(pe,4U); // Skipping the reserved value.
+        fileutl::skip_bytes(pe,4U); // Skipping the reserved value.
 
-        num_data_directory_entries = read_bytes_to_uint32_t(pe,4U,pe_props->is_in_big_endian());
+        num_data_directory_entries = fileutl::read_bytes_to_uint32_t(pe,4U,pe_props->is_in_big_endian());
 
         if (coff_info.optional_header_offset() + coff_info.size_of_optional_header() <
                 (uint32_t)pe.tellg() + num_data_directory_entries * 8U)
@@ -136,70 +136,70 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
     {
         for (uint64_t  num_entries = 0ULL; num_entries < num_data_directory_entries; )
         {
-            export_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            export_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            export_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            export_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            import_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            import_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            import_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            import_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            resource_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            resource_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            resource_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            resource_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            skip_bytes(pe,8ULL); // We ignore exceptions table.
+            fileutl::skip_bytes(pe,8ULL); // We ignore exceptions table.
             if (++num_entries == num_data_directory_entries)
                 break;
-            skip_bytes(pe,8ULL); // We ignore certificate table.
-            if (++num_entries == num_data_directory_entries)
-                break;
-
-            base_relocation_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            base_relocation_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            fileutl::skip_bytes(pe,8ULL); // We ignore certificate table.
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            skip_bytes(pe,8ULL); // We ignore debug data table.
-            if (++num_entries == num_data_directory_entries)
-                break;
-            skip_bytes(pe,8ULL); // We skip reserved bytes.
-            if (++num_entries == num_data_directory_entries)
-                break;
-            skip_bytes(pe,8ULL); // We ignore global ptr.
+            base_relocation_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            base_relocation_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            thread_local_storage_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            thread_local_storage_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            fileutl::skip_bytes(pe,8ULL); // We ignore debug data table.
+            if (++num_entries == num_data_directory_entries)
+                break;
+            fileutl::skip_bytes(pe,8ULL); // We skip reserved bytes.
+            if (++num_entries == num_data_directory_entries)
+                break;
+            fileutl::skip_bytes(pe,8ULL); // We ignore global ptr.
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            load_config_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            load_config_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            thread_local_storage_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            thread_local_storage_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            bound_import_table_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
-            bound_import_table_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            load_config_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            load_config_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            skip_bytes(pe,8ULL); // We ignore import address table address and size.
+            bound_import_table_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+            bound_import_table_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            skip_bytes(pe,8ULL); // We ignore delay import table address and size.
+            fileutl::skip_bytes(pe,8ULL); // We ignore import address table address and size.
             if (++num_entries == num_data_directory_entries)
                 break;
 
-            skip_bytes(pe,8ULL); // We ignore CLG runtime header.
+            fileutl::skip_bytes(pe,8ULL); // We ignore delay import table address and size.
             if (++num_entries == num_data_directory_entries)
                 break;
-            skip_bytes(pe,8ULL); // We skip reserved bytes.
+
+            fileutl::skip_bytes(pe,8ULL); // We ignore CLG runtime header.
+            if (++num_entries == num_data_directory_entries)
+                break;
+            fileutl::skip_bytes(pe,8ULL); // We skip reserved bytes.
 
             break;
         }
@@ -212,7 +212,7 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
 
     // Now we load sections.
 
-    if (file_size(pe_props->path()) <
+    if (fileutl::file_size(pe_props->path()) <
             coff_info.optional_header_offset() + coff_info.size_of_optional_header() +
             coff_info.number_of_sections() * 40U)
         return "Sections in the PE file go beyond the end of the file.";
@@ -251,28 +251,28 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
     bool  data_base_tested = false;
     for (uint32_t  i = 0U; i < coff_info.number_of_sections(); ++i)
     {
-        skip_bytes(pe,8ULL); // We ignore section names
+        fileutl::skip_bytes(pe,8ULL); // We ignore section names
 
-        uint64_t const  memory_size = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  memory_size = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (memory_size == 0ULL)
             return "The size-in-memory of the section at index " + to_string(i) + " is 0.";
-        uint64_t const  memory_address = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  memory_address = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
 
-        uint64_t const  aligned_size_in_file = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  aligned_size_in_file = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (aligned_size_in_file % file_alignment != 0ULL)
             LOAD_PE_WARNING("The size-in-file of the section at index " + to_string(i) + " is not properly aligned.");
-        uint64_t const  aligned_offset_in_file = read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
+        uint64_t const  aligned_offset_in_file = fileutl::read_bytes_to_uint64_t(pe,4U,pe_props->is_in_big_endian());
         if (aligned_offset_in_file % file_alignment != 0ULL)
             return "The offset-in-file of the section at index " + to_string(i) + " is not properly aligned.";
-        if (aligned_offset_in_file + std::min(aligned_size_in_file,memory_size) > file_size(pe_props->path()))
+        if (aligned_offset_in_file + std::min(aligned_size_in_file,memory_size) > fileutl::file_size(pe_props->path()))
             return "The offset-in-file of the section at index " + to_string(i) + " is not properly aligned.";
 
-        skip_bytes(pe,4ULL); // We ignore relocations (this field is 0 for executable images)
-        skip_bytes(pe,4ULL); // We ignore line numbers (debug info is deprecated)
-        skip_bytes(pe,2ULL); // We ignore number of relocations (this field is 0 for executable images or )
-        skip_bytes(pe,2ULL); // We ignore number of line numbers (debug info is deprecated)
+        fileutl::skip_bytes(pe,4ULL); // We ignore relocations (this field is 0 for executable images)
+        fileutl::skip_bytes(pe,4ULL); // We ignore line numbers (debug info is deprecated)
+        fileutl::skip_bytes(pe,2ULL); // We ignore number of relocations (this field is 0 for executable images or )
+        fileutl::skip_bytes(pe,2ULL); // We ignore number of line numbers (debug info is deprecated)
 
-        uint32_t const  flags = read_bytes_to_uint32_t(pe,4U,pe_props->is_in_big_endian());
+        uint32_t const  flags = fileutl::read_bytes_to_uint32_t(pe,4U,pe_props->is_in_big_endian());
 
         bool const  is_code = (flags & 0x20U) != 0U;
         bool const  is_data_initialised = (flags & 0x40U) != 0U;
@@ -637,17 +637,17 @@ std::string  load_pe_32bit(std::ifstream&  pe, file_props_ptr  pe_props,
 
             // Here we have to find and load the DLL library
 
-            std::string const lib_file_name = parse_name_in_pathname(dll_name);
+            std::string const lib_file_name = fileutl::parse_name_in_pathname(dll_name);
             bool  lib_loaded = false;
             if (std::find(load_props.ignored_files().cbegin(),load_props.ignored_files().cend(),lib_file_name)
                     == load_props.ignored_files().cend())
             {
                 for (auto const& search_dir : load_props.search_dirs())
                 {
-                    std::string const raw_lib_pathname = concatenate_file_paths(search_dir,lib_file_name);
-                    if (!file_exists(raw_lib_pathname))
+                    std::string const raw_lib_pathname = fileutl::concatenate_file_paths(search_dir,lib_file_name);
+                    if (!fileutl::file_exists(raw_lib_pathname))
                         continue;
-                    std::string const lib_pathname = normalise_path(absolute_path(raw_lib_pathname));
+                    std::string const lib_pathname = fileutl::normalise_path(fileutl::absolute_path(raw_lib_pathname));
                     if (load_props.files_table()->count(lib_pathname) == 0U)
                     {
                         std::string const  err_message = detail::load_pe(lib_pathname,load_props);

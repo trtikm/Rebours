@@ -1,7 +1,7 @@
 #include <rebours/MAL/loader/detail/mutable_sections_table.hpp>
 #include <rebours/MAL/loader/sections_table.hpp>
-#include <rebours/MAL/loader/buffer_io.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
+#include <rebours/utility/buffer_io.hpp>
+#include <rebours/utility/assumptions.hpp>
 
 namespace loader { namespace detail {
 

@@ -1,9 +1,9 @@
 #include <rebours/MAL/loader/detail/load_pe.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/to_string.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/to_string.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <fstream>
 #include <algorithm>
 
@@ -13,7 +13,7 @@ namespace loader { namespace detail {
 std::pair<file_props_ptr,coff_standard_header_info>
 load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_pe&  load_props, std::string& error_message)
 {
-    if (file_size(pe_file) < 2ULL)
+    if (fileutl::file_size(pe_file) < 2ULL)
     {
         error_message = NOT_PE_FILE();
         return {};
@@ -51,8 +51,8 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
     {
         pe.seekg(0x3cULL); // Skip most of the DOS header (go to pointer to COFF header)
 
-        uint32_t const  pe_header_offset = ::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
-        if (pe_header_offset + 0x17ULL >= file_size(pe_file))
+        uint32_t const  pe_header_offset = fileutl::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
+        if (pe_header_offset + 0x17ULL >= fileutl::file_size(pe_file))
         {
             error_message = "The COFF header passes the end of the file.";
             return {};
@@ -64,7 +64,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
     // Now we read the COFF header
 
     {
-        uint32_t const  pe_signature = ::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
+        uint32_t const  pe_signature = fileutl::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
         if (pe_signature != 0x4550U) // ASCII "PE\0\0"
         {
             error_message = "Wrong PE signature.";
@@ -72,7 +72,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
         }
 
         architecture_t arch;
-        uint32_t const  arch_id = ::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
+        uint32_t const  arch_id = fileutl::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
         switch (arch_id)
         {
         case 0x8664U:
@@ -92,13 +92,13 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
             ASSUMPTION(load_props.platform().operator bool());
         }
 
-        number_of_sections = ::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
+        number_of_sections = fileutl::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
 
-        skip_bytes(pe,12U); // We skip the time-stamp and two deprecated fields.
+        fileutl::skip_bytes(pe,12U); // We skip the time-stamp and two deprecated fields.
 
-        size_of_optional_header = ::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
+        size_of_optional_header = fileutl::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
 
-        uint32_t const  characteristics = ::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
+        uint32_t const  characteristics = fileutl::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
 
         is_executable_file = (characteristics & 0x2U) != 0U;
         is_dynamic_library = (characteristics & 0x2000U) != 0U;
@@ -114,7 +114,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
             LOAD_PE_WARNING_IN(pe_file,"The PE file is inconsistent. It indicates a 32-bit machine with 64-bit addressing.");
 
         optional_header_offset = (uint32_t)pe.tellg();
-        if (optional_header_offset + size_of_optional_header > file_size(pe_file))
+        if (optional_header_offset + size_of_optional_header > fileutl::file_size(pe_file))
         {
             error_message = "The optional header goes beyond the end of file.";
             return {};
@@ -132,7 +132,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
     // Now we read the optional header (although it is called optional, it must always be present)
 
     {
-        uint32_t const  magic = ::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
+        uint32_t const  magic = fileutl::read_bytes_to_uint32_t(pe,2U,is_file_in_big_endian);
         switch (magic)
         {
         case 0x10bU: // PE32
@@ -149,16 +149,16 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
             return {};
         }
 
-        skip_bytes(pe,2ULL); // We do not use neither major nor minor linker version.
+        fileutl::skip_bytes(pe,2ULL); // We do not use neither major nor minor linker version.
 
-        size_of_code = ::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
-        size_of_initialised_data = ::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
-        size_of_uninitialised_data = ::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
-        address_of_entry_point = ::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
-        base_of_code = ::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
+        size_of_code = fileutl::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
+        size_of_initialised_data = fileutl::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
+        size_of_uninitialised_data = fileutl::read_bytes_to_uint32_t(pe,4U,is_file_in_big_endian);
+        address_of_entry_point = fileutl::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
+        base_of_code = fileutl::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
 
         if (num_address_bits == 32U) // The 'base_of_data' filed is missing in 64-bit mode.
-            base_of_data = ::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
+            base_of_data = fileutl::read_bytes_to_uint64_t(pe,4U,is_file_in_big_endian);
 
         if (address_of_entry_point < base_of_code || address_of_entry_point >= base_of_code + size_of_code)
         {
@@ -169,7 +169,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
 
     static uint32_t file_id_generator = 0U; // TODO: This is not an ideal implementation: move it to load_props.
     file_props_ptr const  pe_props { new file_props{
-            normalise_path(absolute_path(pe_file)),
+            fileutl::normalise_path(fileutl::absolute_path(pe_file)),
             format::PE(),
             is_file_in_big_endian,
             num_address_bits,
@@ -197,7 +197,7 @@ load_pe_file_props(std::string const&  pe_file, std::ifstream&  pe, load_props_p
 
 std::string  load_pe(std::string const& pe_file, load_props_pe&  load_props)
 {
-    ASSUMPTION( file_exists(pe_file) );
+    ASSUMPTION( fileutl::file_exists(pe_file) );
     ASSUMPTION( load_props.files_table()->count(pe_file) == 0U );
 
     std::ifstream  pe{pe_file,std::ifstream::binary};

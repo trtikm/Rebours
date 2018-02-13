@@ -2,10 +2,10 @@
 #include <rebours/MAL/loader/detail/abi_loaders.hpp>
 #include <rebours/MAL/loader/detail/address_fixing.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/to_string.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/to_string.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <algorithm>
 #include <sstream>
 #include <fstream>
@@ -36,8 +36,8 @@ std::string  load_mach_32bit(std::ifstream&  mach, file_props_ptr  mach_props,
     {
         uint64_t const  command_offset = mach.tellg();
 
-        uint32_t const  commnad_type = read_bytes_to_int32_t(mach,4U,mach_props->is_in_big_endian());
-        uint32_t const  commnad_size = read_bytes_to_int32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  commnad_type = fileutl::read_bytes_to_int32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  commnad_size = fileutl::read_bytes_to_int32_t(mach,4U,mach_props->is_in_big_endian());
 
         if (commnad_size % 4U != 0U)
             return "Reached a load command which is not 4-byte aligned.";

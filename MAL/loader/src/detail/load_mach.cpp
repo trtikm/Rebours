@@ -1,10 +1,10 @@
 #include <rebours/MAL/loader/detail/load_mach.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/to_string.hpp>
-#include <rebours/MAL/loader/endian.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/to_string.hpp>
+#include <rebours/utility/endian.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <fstream>
 #include <algorithm>
 
@@ -14,7 +14,7 @@ std::pair<file_props_ptr,mach_header_props>
 load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
                      load_props_mach&  load_props, std::string& error_message)
 {
-    if (file_size(mach_file) < 4ULL)
+    if (fileutl::file_size(mach_file) < 4ULL)
     {
         error_message = NOT_MACH_FILE();
         return {};
@@ -27,7 +27,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
 
     uint8_t  num_address_bits = 0U;
     {
-        uint32_t const  magic = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
+        uint32_t const  magic = fileutl::read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
         if (magic == 0xfeedfaceU) // Mach-O 32 bit
             num_address_bits = 32U;
         else if (magic == 0xfeedfacfU)  // Mach-O 64 bit
@@ -46,10 +46,10 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
 
     // Now we read the rest of the header
 
-    uint32_t const  cpu_type = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
+    uint32_t const  cpu_type = fileutl::read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
 
     //uint32_t const  cpu_subtype = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
-    skip_bytes(mach,4U); // We ignore cpu-sub-type.
+    fileutl::skip_bytes(mach,4U); // We ignore cpu-sub-type.
 
     if ((num_address_bits == 64U && cpu_type != 0x1000007) ||
         (num_address_bits == 32U && cpu_type != 0x7) )
@@ -64,7 +64,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
 
     platform_ptr const  file_platform{ new platform(arch, abi) };
 
-    uint32_t const  filetype = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
+    uint32_t const  filetype = fileutl::read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
 
     if (filetype != 0x2U && filetype != 0x3U && filetype != 0x6U)
     {
@@ -75,7 +75,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
     bool const  is_dynamic_library = filetype == 0x3U || filetype == 0x6U;
     bool const  is_fixed_dynamic_library = filetype == 0x3U;
 
-    uint32_t const  num_load_commnads = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
+    uint32_t const  num_load_commnads = fileutl::read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
 
     if (num_load_commnads == 0U)
     {
@@ -83,7 +83,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
         return {};
     }
 
-    uint32_t const  total_num_commnad_bytes = read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
+    uint32_t const  total_num_commnad_bytes = fileutl::read_bytes_to_int32_t(mach,4U,is_file_in_big_endian);
 
     if (total_num_commnad_bytes < num_load_commnads * (num_address_bits / 8U))
     {
@@ -91,12 +91,12 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
         return {};
     }
 
-    skip_bytes(mach,4ULL); // We ignore flags.
+    fileutl::skip_bytes(mach,4ULL); // We ignore flags.
 
     if (num_address_bits == 64U)
-        skip_bytes(mach,4ULL); // We skip the reserved word.
+        fileutl::skip_bytes(mach,4ULL); // We skip the reserved word.
 
-    if ((uint64_t)mach.tellg() + (uint64_t)total_num_commnad_bytes >= (uint64_t)file_size(mach_file))
+    if ((uint64_t)mach.tellg() + (uint64_t)total_num_commnad_bytes >= fileutl::file_size(mach_file))
     {
         error_message = "The list of load commands goes beyond the end of the file.";
         return {};
@@ -106,7 +106,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
 
     static uint32_t file_id_generator = 0U;  // TODO: This is not an ideal implementation: move it to load_props.
     file_props_ptr const  mach_props { new file_props{
-            normalise_path(absolute_path(mach_file)),
+            fileutl::normalise_path(fileutl::absolute_path(mach_file)),
             format::MACH(),
             is_file_in_big_endian,
             num_address_bits,
@@ -131,7 +131,7 @@ load_mach_file_props(std::string const&  mach_file, std::ifstream&  mach,
 
 std::string  load_mach(std::string const& mach_file, load_props_mach&  load_props)
 {
-    ASSUMPTION( file_exists(mach_file) );
+    ASSUMPTION( fileutl::file_exists(mach_file) );
     ASSUMPTION( load_props.files_table()->count(mach_file) == 0U );
 
     std::ifstream  mach{mach_file,std::ifstream::binary};

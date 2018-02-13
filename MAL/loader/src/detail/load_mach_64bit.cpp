@@ -2,10 +2,10 @@
 #include <rebours/MAL/loader/detail/abi_loaders.hpp>
 #include <rebours/MAL/loader/detail/address_fixing.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/to_string.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/to_string.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <algorithm>
 #include <sstream>
 #include <fstream>
@@ -28,7 +28,7 @@ uint64_t  read_uleb128(std::ifstream&  mach, uint64_t const  end_offset, std::st
             error_message = "Wrong ULEB128";
             return std::numeric_limits<uint64_t>::max();
         }
-        uint8_t const  byte = ::read_byte(mach);
+        uint8_t const  byte = fileutl::read_byte(mach);
         result |= ((uint64_t)(byte & 0x7fU) << shift);
         shift += 7U;
         if ((byte & 0x80U) == 0)
@@ -48,7 +48,7 @@ int64_t  read_sleb128(std::ifstream&  mach, uint64_t const  end_offset, std::str
             error_message = "Wrong SLEB128";
             return std::numeric_limits<int64_t>::max();
         }
-        uint8_t const  byte = ::read_byte(mach);
+        uint8_t const  byte = fileutl::read_byte(mach);
         result |= ((uint64_t)(byte & 0x7fU) << shift);
         shift += 7U;
         if ((byte & 0x80U) == 0)
@@ -66,12 +66,12 @@ std::string  process_LC_SEGMENT_64(std::ifstream&  mach, file_props_ptr  mach_pr
                                    bool const  is_fixed_dynamic_library,
                                    load_props_mach&  load_props)
 {
-    skip_bytes(mach,16U); // We ignore segment name
+    fileutl::skip_bytes(mach,16U); // We ignore segment name
 
-    uint64_t const  memory_address = read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
+    uint64_t const  memory_address = fileutl::read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
     if (memory_address % 0x1000ULL != 0ULL) // Is not aligned to page size?
         return "Virtual address of the loaded segment is not page aligned.";
-    uint64_t const  size_in_memory = read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
+    uint64_t const  size_in_memory = fileutl::read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
 
     address  fixed_memory_address = memory_base_shift + memory_address;
     if (load_props.root_file() != mach_props->path() && !is_fixed_dynamic_library)
@@ -79,24 +79,24 @@ std::string  process_LC_SEGMENT_64(std::ifstream&  mach, file_props_ptr  mach_pr
                                                              size_in_memory + memory_address % 0x1000ULL) +
                                memory_address % 0x1000ULL;
 
-    uint64_t const  file_offset = read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
-    uint64_t const  size_in_file = read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
-    if (file_offset + size_in_file > file_size(mach_props->path()))
+    uint64_t const  file_offset = fileutl::read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
+    uint64_t const  size_in_file = fileutl::read_bytes_to_int64_t(mach,8U,mach_props->is_in_big_endian());
+    if (file_offset + size_in_file > fileutl::file_size(mach_props->path()))
         return "The loaded segment goes beyond the loaded binary.";
     if (size_in_memory < size_in_file)
         return "The loaded segment has a smaller size in the memory than in the file.";
 
-    skip_bytes(mach,4U); // We ignore max protection flags.
-    uint32_t const  init_protection = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    fileutl::skip_bytes(mach,4U); // We ignore max protection flags.
+    uint32_t const  init_protection = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
     if (init_protection > 7U)
         return "Invalid section protection flags.";
-    bool const  is_readable = init_protection & 1U;
-    bool const  is_writeable = init_protection & 2U;
-    bool const  is_executable = init_protection & 4U;
+    bool const  is_readable = (init_protection & 1U) != 0U;
+    bool const  is_writeable = (init_protection & 2U) != 0U;
+    bool const  is_executable = (init_protection & 4U) != 0U;
 
-    uint32_t const  num_sections = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  num_sections = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 
-    uint32_t const  flags = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  flags = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
     bool const  load_to_high_addresses = (flags & 1U) != 0U;
     bool const  load_to_fixed_address = (flags & 2U) != 0U;
     if (load_to_fixed_address && memory_address != fixed_memory_address)
@@ -169,14 +169,14 @@ std::string  process_LC_SEGMENT_64(std::ifstream&  mach, file_props_ptr  mach_pr
 //        ::read_bytes(mach,16,section_name);
 //        std::string  segment_name;
 //        ::read_bytes(mach,16,segment_name);
-        skip_bytes(mach,16ULL+16ULL); // Skip section and segment names
+        fileutl::skip_bytes(mach,16ULL+16ULL); // Skip section and segment names
 
-        address const  section_start_address = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
-        uint64_t const  section_size = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+        address const  section_start_address = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+        uint64_t const  section_size = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
 
-        skip_bytes(mach,4ULL+4ULL+4ULL+4ULL); // Skip offset, align, and relocations offset and count
+        fileutl::skip_bytes(mach,4ULL+4ULL+4ULL+4ULL); // Skip offset, align, and relocations offset and count
 
-        uint32_t const  section_flags = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  section_flags = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 
         if ((section_flags & 0xffU) == 0x9U) // is it section S_MOD_INIT_FUNC_POINTERS?
         {
@@ -232,7 +232,7 @@ std::string  process_LC_LOAD_DYLIB(std::ifstream&  mach, file_props_ptr  mach_pr
     bool  is_system_lib = false;
     std::string  lib_file_name;
     {
-        uint32_t const  path_name_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  path_name_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
         std::vector<char>  buffer(command_size - path_name_offset + 1ULL,0U);
         mach.seekg(command_offset + path_name_offset);
         mach.read(buffer.data(),buffer.size()-1ULL);
@@ -243,7 +243,7 @@ std::string  process_LC_LOAD_DYLIB(std::ifstream&  mach, file_props_ptr  mach_pr
             path_name.find("/usr/lib/libobjc") == 0ULL ||
             path_name.find("/usr/lib/libDiagnostic") == 0ULL )
             is_system_lib = true;
-        lib_file_name = parse_name_in_pathname(path_name);
+        lib_file_name = fileutl::parse_name_in_pathname(path_name);
     }
 
     bool  lib_loaded = false;
@@ -252,10 +252,10 @@ std::string  process_LC_LOAD_DYLIB(std::ifstream&  mach, file_props_ptr  mach_pr
     {
         for (auto const& search_dir : load_props.search_dirs())
         {
-            std::string const raw_lib_pathname = concatenate_file_paths(search_dir,lib_file_name);
-            if (!file_exists(raw_lib_pathname))
+            std::string const raw_lib_pathname = fileutl::concatenate_file_paths(search_dir,lib_file_name);
+            if (!fileutl::file_exists(raw_lib_pathname))
                 continue;
-            std::string const lib_pathname = normalise_path(absolute_path(raw_lib_pathname));
+            std::string const lib_pathname = fileutl::normalise_path(fileutl::absolute_path(raw_lib_pathname));
             if (load_props.files_table()->count(lib_pathname) == 0U)
             {
                 std::string const  err_message = detail::load_mach(lib_pathname,load_props);
@@ -286,14 +286,14 @@ std::string  process_LC_LOAD_DYLIB(std::ifstream&  mach, file_props_ptr  mach_pr
 
 std::string  process_LC_SYMTAB(std::ifstream&  mach, file_props_ptr  mach_props, load_props_mach&  load_props)
 {
-    uint32_t const  symbol_table_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    uint32_t const  num_symbols = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    if (symbol_table_offset + 16U * num_symbols > file_size(mach_props->path()))
+    uint32_t const  symbol_table_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  num_symbols = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    if (symbol_table_offset + 16U * num_symbols > fileutl::file_size(mach_props->path()))
         return "Symbol table goes beyond the end of the file.";
 
-    uint32_t const  string_table_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    uint32_t const  string_table_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    if (string_table_offset + string_table_size > file_size(mach_props->path()))
+    uint32_t const  string_table_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  string_table_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    if (string_table_offset + string_table_size > fileutl::file_size(mach_props->path()))
         return "String table goes beyond the end of the file.";
 
     std::map<uint64_t,std::string>  strings;
@@ -302,22 +302,22 @@ std::string  process_LC_SYMTAB(std::ifstream&  mach, file_props_ptr  mach_props,
         while (mach.tellg() < string_table_offset + string_table_size)
         {
             uint64_t const  offset = (uint64_t)mach.tellg() - (uint64_t)string_table_offset;
-            strings.insert({offset,read_bytes_as_null_terminated_string(mach)});
+            strings.insert({offset,fileutl::read_bytes_as_null_terminated_string(mach)});
         }
-        if (mach.tellg() != string_table_offset + string_table_size)
+        if ((uint32_t)mach.tellg() != string_table_offset + string_table_size)
             return "Inconsistency between actual and expected size of the string table.";
     }
 
     mach.seekg(symbol_table_offset);
     for (uint32_t  i = 0U; i < num_symbols; ++i)
     {
-        uint32_t const  string_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  string_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
         if (string_offset > string_table_size)
             return "Symbol's offset goes beyond the string table.";
-        uint8_t const  type_flags = ::read_byte(mach);
-        uint8_t const  section_number = ::read_byte(mach);
-        uint16_t const  description = read_bytes_to_uint16_t(mach,2U,mach_props->is_in_big_endian());
-        uint64_t const  value = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+        uint8_t const  type_flags = fileutl::read_byte(mach);
+        uint8_t const  section_number = fileutl::read_byte(mach);
+        uint16_t const  description = fileutl::read_bytes_to_uint16_t(mach,2U,mach_props->is_in_big_endian());
+        uint64_t const  value = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
 
         if ((type_flags & 0xe0U) != 0x0U) // Is is a symbolic debugging entry?
             continue;
@@ -354,17 +354,17 @@ std::string  process_LC_SYMTAB(std::ifstream&  mach, file_props_ptr  mach_props,
 
 std::string  process_LC_DYSYMTAB(std::ifstream&  mach, file_props_ptr  mach_props, load_props_mach&  load_props)
 {
-    skip_bytes(mach,4U); // We ignore the start index of local symbols.
-    skip_bytes(mach,4U); // We ignore the number of local symbols.
+    fileutl::skip_bytes(mach,4U); // We ignore the start index of local symbols.
+    fileutl::skip_bytes(mach,4U); // We ignore the number of local symbols.
 
-    uint32_t const  extern_symbol_start_index = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    uint32_t const  num_extern_symbols = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  extern_symbol_start_index = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  num_extern_symbols = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 
     if (extern_symbol_start_index + num_extern_symbols > load_props.get_max_symbol_id(mach_props->path()) + 1U)
         return "Ordinal of an extern symbol is greater than the max ordinal in the symbol table.";
 
-    uint32_t const  undef_symbol_start_index = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-    uint32_t const  num_undef_symbols = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  undef_symbol_start_index = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+    uint32_t const  num_undef_symbols = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 
     if (undef_symbol_start_index + num_undef_symbols > load_props.get_max_symbol_id(mach_props->path()) + 1U)
         return "Ordinal of an undefined symbol is greater than the max ordinal in the symbol table.";
@@ -453,7 +453,7 @@ std::string  perform_rebase(uint32_t const  offset, uint32_t const  size,
 {
     if (offset == 0U || size == 0U)
         return "Rebase info is missing.";
-    if (offset + size > file_size(mach_props->path()))
+    if (offset + size > fileutl::file_size(mach_props->path()))
         return "Rebase info goes beyond the end of the binary file.";
 
     int64_t const  shift = (int64_t)load_props.fixed_base_address_for(mach_props->path()) -
@@ -468,7 +468,7 @@ std::string  perform_rebase(uint32_t const  offset, uint32_t const  size,
     mach.seekg(offset);
     while (mach.tellg() < offset + size)
     {
-        uint8_t const  instruction = ::read_byte(mach);
+        uint8_t const  instruction = fileutl::read_byte(mach);
         uint8_t const  opcode = instruction & 0xf0U;
         uint8_t const  arg = instruction & 0xfU;
 
@@ -488,7 +488,7 @@ std::string  perform_rebase(uint32_t const  offset, uint32_t const  size,
                 uint64_t const  offset_in_segment = read_uleb128(mach,offset + size,error_message);
                 if (!error_message.empty())
                     return error_message + " in the extra data of the REBASE_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB instruction.";
-                rebase_address = load_props.fixed_address_for(mach_props->path(),segment_index) + offset_in_segment;
+                rebase_address = load_props.fixed_address_for(mach_props->path(),(uint32_t)segment_index) + offset_in_segment;
             }
             break;
         case 0x30U: // REBASE_OPCODE_ADD_ADDR_ULEB:
@@ -597,10 +597,10 @@ std::string  apply_binding(uint64_t const  dylib_index, uint64_t const  segment_
             library.clear(); // Flat symbol lookup!
         else if ((int64_t)dylib_index < 0LL)
             return "Cannot resolve binding, since the library index has unknown negative value.";
-        else if (!load_props.has_library(mach_props->path(),dylib_index - 1ULL))
+        else if (!load_props.has_library(mach_props->path(),(uint32_t)(dylib_index - 1ULL)))
             return "Cannot resolve binding, since the library index does not reference any library in the table.";
         else
-            library = load_props.get_library(mach_props->path(),dylib_index - 1ULL);
+            library = load_props.get_library(mach_props->path(),(uint32_t)(dylib_index - 1ULL));
     }
     if (load_props.is_skipped_file(library))
     {
@@ -738,7 +738,7 @@ std::string  perform_symbol_binding(uint32_t const  offset, uint32_t const  size
 {
     if (offset == 0U || size == 0U)
         return "Relocations are missing.";
-    if (offset + size > file_size(mach_props->path()))
+    if (offset + size > fileutl::file_size(mach_props->path()))
         return "Relocations goes beyond the end of the binary file.";
 
     uint64_t dylib_index = 0ULL;
@@ -756,7 +756,7 @@ std::string  perform_symbol_binding(uint32_t const  offset, uint32_t const  size
     mach.seekg(offset);
     while (mach.tellg() < offset + size)
     {
-        uint8_t const  instruction = ::read_byte(mach);
+        uint8_t const  instruction = fileutl::read_byte(mach);
         uint8_t const  opcode = instruction & 0xf0U;
         uint8_t const  arg = instruction & 0xfU;
 
@@ -768,7 +768,7 @@ std::string  perform_symbol_binding(uint32_t const  offset, uint32_t const  size
         case 0x10U: // BIND_OPCODE_SET_DYLIB_ORDINAL_IMM: Set the library ordinal of the current symbol to the imm operand.
             description += std::string(description.empty() ? "" : ", ") + "BIND_OPCODE_SET_DYLIB_ORDINAL_IMM";
             dylib_index = arg;
-            if (!load_props.has_library(mach_props->path(),dylib_index - 1ULL))
+            if (!load_props.has_library(mach_props->path(),(uint32_t)(dylib_index - 1ULL)))
                 return "Argument of BIND_OPCODE_SET_DYLIB_ORDINAL_IMM instruction does not reference any library.";
             break;
         case 0x20U: // BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB: Same as above, but the library ordinary is read from the unsigned LEB128-encoded extra data.
@@ -776,21 +776,21 @@ std::string  perform_symbol_binding(uint32_t const  offset, uint32_t const  size
             dylib_index = read_uleb128(mach,offset + size,error_message);
             if (!error_message.empty())
                 return error_message + " in the extra data of the BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB instruction.";
-            if (!load_props.has_library(mach_props->path(),dylib_index - 1ULL))
+            if (!load_props.has_library(mach_props->path(),(uint32_t)(dylib_index - 1ULL)))
                 return "Argument of BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB instruction does not reference any library.";
             break;
         case 0x30U: // BIND_OPCODE_SET_DYLIB_SPECIAL_IMM: Same as above, but the ordinary as set as negative of imm.
                     //      Typical values are:  0 = SELF, -1 = MAIN_EXECUTABLE, -2 = FLAT_LOOKUP
             description += std::string(description.empty() ? "" : ", ") + "BIND_OPCODE_SET_DYLIB_SPECIAL_IMM";
             dylib_index = (arg == 0U) ? 0ULL : (uint64_t)((int8_t)0xf0 | (int8_t)arg);
-            if ((int64_t)dylib_index > 0LL && !load_props.has_library(mach_props->path(),dylib_index - 1ULL))
+            if ((int64_t)dylib_index > 0LL && !load_props.has_library(mach_props->path(),(uint32_t)(dylib_index - 1ULL)))
                 return "Argument of BIND_OPCODE_SET_DYLIB_SPECIAL_IMM instruction does not reference any library.";
             break;
         case 0x40U: // BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM	Set flags of the symbol in imm, and the symbol name as a C string in the extra data.
                     //      The flags are: 1 = WEAK_IMPORT, 8 = NON_WEAK_DEFINITION
             description += std::string(description.empty() ? "" : ", ") + "BIND_OPCODE_SET_SYMBOL_TRAILING_FLAGS_IMM";
             symbol_flags = arg;
-            symbol_name = ::read_bytes_as_null_terminated_string(mach);
+            symbol_name = fileutl::read_bytes_as_null_terminated_string(mach);
             if (symbol_name.empty())
                 return "The symbol in the extra data of the SET_SEGMENT_AND_OFFSET_ULEB is empty.";
             break;
@@ -812,7 +812,7 @@ std::string  perform_symbol_binding(uint32_t const  offset, uint32_t const  size
                 uint64_t const  offset_in_segment = read_uleb128(mach,offset + size,error_message);
                 if (!error_message.empty())
                     return error_message + " in the extra data of the BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB relocation instruction.";
-                bind_address = load_props.fixed_address_for(mach_props->path(),segment_index) + offset_in_segment;
+                bind_address = load_props.fixed_address_for(mach_props->path(),(uint32_t)segment_index) + offset_in_segment;
             }
             break;
         case 0x80U: // BIND_OPCODE_ADD_ADDR_ULEB: Increase the offset (as above) by the ULEB128-encoded extra data.
@@ -950,8 +950,8 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
     {
         uint64_t const  command_offset = mach.tellg();
 
-        uint32_t const  command_type = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-        uint32_t const  command_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  command_type = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+        uint32_t const  command_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 
         if (command_size % 8U != 0U)
             return "Reached a load command which is not 8-byte aligned.";
@@ -971,14 +971,14 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
                     return "Wrong order of load commands (LC_DYLD_INFO should go after LC_SEGMENT_64).";
                 if (dyld_info_loaded)
                     return "Dynamic info load command appears more than once in the binary.";
-                uint32_t const  rebase_off = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                uint32_t const  rebase_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                bind_off = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                bind_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                weak_bind_off = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                weak_bind_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                lazy_bind_off = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                lazy_bind_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  rebase_off = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  rebase_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                bind_off = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                bind_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                weak_bind_off = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                weak_bind_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                lazy_bind_off = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                lazy_bind_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 //                export_off = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
 //                export_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
                 dyld_info_loaded = true;
@@ -999,7 +999,7 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
                 return "The binary contains more than one LC_MAIN load command.";
             if (is_it_load_of_root_binary && mach_props->has_property_value(file_properties::file_type(),file_types::executable()))
             {
-                uint64_t const  main_offset = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+                uint64_t const  main_offset = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
                 uint64_t const  main_address = load_props.fixed_base_address_for(mach_props->path()) + main_offset;
                 if (!find_section(main_address,load_props.sections_table()).operator bool())
                     return "The address of the main function does not point to any of the loaded segments.";
@@ -1012,7 +1012,7 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
             break;
         case 0x24U: // LC_VERSION_MIN_MACOSX: build for MacOSX min OS version
             {
-                uint32_t const  version = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  version = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
                 std::ostringstream  ostr;
                 ostr << (version >> 16U) << "." << ((version & 0xff00) >> 8U) << "." << (version & 0xff);
                 std::string const  version_string = ostr.str();
@@ -1030,7 +1030,7 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
             break;
         case 0xeU:  // LC_LOAD_DYLINKER: load a dynamic linker
             {
-                uint32_t const  path_name_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  path_name_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
                 std::vector<char>  buffer(command_size - path_name_offset + 1ULL,0U);
                 mach.seekg(command_offset + path_name_offset);
                 mach.read(buffer.data(),buffer.size()-1ULL);
@@ -1049,8 +1049,8 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
             break;
         case 0x1aU: // LC_ROUTINES_64: 64-bit image routines
             {
-                uint64_t const init_fn_address = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
-                uint64_t const init_fn_module = read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+                uint64_t const init_fn_address = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
+                uint64_t const init_fn_module = fileutl::read_bytes_to_uint64_t(mach,8U,mach_props->is_in_big_endian());
                 // 'init_fn_address' is the virtual memory address of the initialization function.
                 // 'init_fn_module' is the index into the module table that the init routine is defined in.
                 // Unfortunatelly, we have no test example for this command, so it is left
@@ -1062,8 +1062,8 @@ std::string  load_mach_64bit(std::ifstream&  mach, file_props_ptr  mach_props,
             break;
         case 0x26U: // LC_FUNCTION_STARTS : compressed table of function start addresses
             {
-                uint32_t const  data_offset = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
-                uint32_t const  data_size = read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  data_offset = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
+                uint32_t const  data_size = fileutl::read_bytes_to_uint32_t(mach,4U,mach_props->is_in_big_endian());
                 mach.seekg(data_offset);
                 uint64_t  fn_address = load_props.fixed_base_address_for(mach_props->path());
                 while ((uint64_t)mach.tellg() < data_offset + data_size)

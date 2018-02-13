@@ -1,10 +1,10 @@
 #include <rebours/MAL/loader/load.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
+#include <rebours/utility/file_utils.hpp>
 #include <rebours/MAL/loader/detail/load_elf.hpp>
 #include <rebours/MAL/loader/detail/load_pe.hpp>
 #include <rebours/MAL/loader/detail/load_mach.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <algorithm>
 #include <fstream>
 
@@ -92,12 +92,12 @@ descriptor_ptr  load_elf(std::string const& elf_file,
                          std::vector<std::string> const&  search_directories_for_dynamic_link_files,
                          std::string& error_message)
 {
-    if (!file_exists(elf_file))
+    if (!fileutl::file_exists(elf_file))
     {
         error_message = "The passed file does not exist.";
         return descriptor_ptr();
     }
-    if (is_directory(elf_file))
+    if (fileutl::is_directory(elf_file))
     {
         error_message = "The passed path does not reference a file.";
         return descriptor_ptr();
@@ -106,7 +106,7 @@ descriptor_ptr  load_elf(std::string const& elf_file,
     ASSUMPTION( error_message.empty() );
 
     detail::load_props_elf  load_props{
-            normalise_path(absolute_path(elf_file)),
+            fileutl::normalise_path(fileutl::absolute_path(elf_file)),
             ignored_dynamic_link_files,
             search_directories_for_dynamic_link_files
             };
@@ -174,12 +174,12 @@ descriptor_ptr  load_pe(std::string const&  pe_file,
                         std::vector<std::string> const&  search_directories_for_dynamic_link_files,
                         std::string& error_message)
 {
-    if (!file_exists(pe_file))
+    if (!fileutl::file_exists(pe_file))
     {
         error_message = "The passed file does not exist.";
         return descriptor_ptr();
     }
-    if (is_directory(pe_file))
+    if (fileutl::is_directory(pe_file))
     {
         error_message = "The passed path does not reference a file.";
         return descriptor_ptr();
@@ -188,7 +188,7 @@ descriptor_ptr  load_pe(std::string const&  pe_file,
     ASSUMPTION( error_message.empty() );
 
     detail::load_props_pe  load_props{
-            normalise_path(absolute_path(pe_file)),
+            fileutl::normalise_path(fileutl::absolute_path(pe_file)),
             ignored_dynamic_link_files,
             search_directories_for_dynamic_link_files
             };
@@ -259,12 +259,12 @@ descriptor_ptr  load_mach(std::string const&  mach_file,
                           std::vector<std::string> const&  search_directories_for_dynamic_link_files,
                           std::string& error_message)
 {
-    if (!file_exists(mach_file))
+    if (!fileutl::file_exists(mach_file))
     {
         error_message = "The passed file does not exist.";
         return descriptor_ptr();
     }
-    if (is_directory(mach_file))
+    if (fileutl::is_directory(mach_file))
     {
         error_message = "The passed path does not reference a file.";
         return descriptor_ptr();
@@ -273,7 +273,7 @@ descriptor_ptr  load_mach(std::string const&  mach_file,
     ASSUMPTION( error_message.empty() );
 
     detail::load_props_mach  load_props{
-            normalise_path(absolute_path(mach_file)),
+            fileutl::normalise_path(fileutl::absolute_path(mach_file)),
             ignored_dynamic_link_files,
             search_directories_for_dynamic_link_files
             };

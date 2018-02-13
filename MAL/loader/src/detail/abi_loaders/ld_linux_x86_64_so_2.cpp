@@ -1,8 +1,8 @@
 #include <rebours/MAL/loader/detail/abi_loaders.hpp>
 #include <rebours/MAL/loader/special_sections.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
-#include <rebours/MAL/loader/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/msgstream.hpp>
 #include <unordered_map>
 #include <iostream>
 
@@ -220,7 +220,7 @@ std::string  perform_relocations(
                                                                    << "' does not contain TLS section."});
                     break;
                 }
-                uint64_t const  value_to_write = (has_symbol ? : symbol_value) + addend - (tls->end_address() - tls->start_address());
+                uint64_t const  value_to_write = symbol_value + addend - (tls->end_address() - tls->start_address());
                 std::string const  error_message = write_address(relocation_address,value_to_write,load_props.sections_table());
                 if (!error_message.empty())
                 {

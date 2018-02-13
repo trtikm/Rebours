@@ -1,8 +1,8 @@
 #include <rebours/MAL/loader/detail/load_elf.hpp>
 #include <rebours/MAL/loader/detail/set_file_property.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <fstream>
 #include <algorithm>
 
@@ -12,7 +12,7 @@ namespace loader { namespace detail {
 file_props_ptr  load_elf_file_props(std::string const&  elf_file, std::ifstream&  elf,
                                     load_props_elf&  load_props, std::string& error_message)
 {
-    if (file_size(elf_file) < 6ULL)
+    if (fileutl::file_size(elf_file) < 6ULL)
     {
         error_message = NOT_ELF_FILE();
         return file_props_ptr();
@@ -31,13 +31,13 @@ file_props_ptr  load_elf_file_props(std::string const&  elf_file, std::ifstream&
     }
 
     elf.seekg(0x05ULL);
-    uint8_t  endian_mode = ::read_byte(elf);
+    uint8_t  endian_mode = fileutl::read_byte(elf);
     if (endian_mode != 1 && endian_mode != 2)
     {
         elf.seekg(0x10ULL);
-        uint32_t const  binary_type_little_endian = ::read_bytes_to_uint32_t(elf,2U,false);
+        uint32_t const  binary_type_little_endian = fileutl::read_bytes_to_uint32_t(elf,2U,false);
         elf.seekg(0x10ULL);
-        uint32_t const  binary_type_big_endian = ::read_bytes_to_uint32_t(elf,2U,true);
+        uint32_t const  binary_type_big_endian = fileutl::read_bytes_to_uint32_t(elf,2U,true);
         bool const  little_cond = binary_type_little_endian == 2U || binary_type_little_endian == 3U;
         bool const  big_cond = binary_type_big_endian == 2U || binary_type_big_endian == 3U;
         if (little_cond && !big_cond)
@@ -67,14 +67,14 @@ file_props_ptr  load_elf_file_props(std::string const&  elf_file, std::ifstream&
     bool const is_file_in_big_endian = endian_mode == 1 ? false : true;
 
     elf.seekg(0x04ULL);
-    uint8_t  address_mode = ::read_byte(elf);
+    uint8_t  address_mode = fileutl::read_byte(elf);
     if (address_mode != 1 && address_mode != 2)
     {
         elf.seekg(0x1CULL);
-        uint32_t const  phd_offset_32 = ::read_bytes_to_uint32_t(elf,4U,is_file_in_big_endian);
-        uint64_t const  phd_offset_64 = ::read_bytes_to_uint64_t(elf,8U,is_file_in_big_endian);
-        bool const  cond32 = phd_offset_32 != 0U && phd_offset_32 < file_size(elf_file);
-        bool const  cond64 = phd_offset_64 != 0U && phd_offset_64 < file_size(elf_file);
+        uint32_t const  phd_offset_32 = fileutl::read_bytes_to_uint32_t(elf,4U,is_file_in_big_endian);
+        uint64_t const  phd_offset_64 = fileutl::read_bytes_to_uint64_t(elf,8U,is_file_in_big_endian);
+        bool const  cond32 = phd_offset_32 != 0U && phd_offset_32 < fileutl::file_size(elf_file);
+        bool const  cond64 = phd_offset_64 != 0U && phd_offset_64 < fileutl::file_size(elf_file);
         if (cond32 && !cond64)
         {
             address_mode =  1U;
@@ -104,7 +104,7 @@ file_props_ptr  load_elf_file_props(std::string const&  elf_file, std::ifstream&
     elf.seekg(0x06ULL);
 
     file_props_ptr const  elf_props{ new file_props{
-            normalise_path(absolute_path(elf_file)),
+            fileutl::normalise_path(fileutl::absolute_path(elf_file)),
             format::ELF(),
             is_file_in_big_endian,
             (uint8_t)(file_uses_32_bit_addresses ? 32U : 64U),
@@ -118,7 +118,7 @@ file_props_ptr  load_elf_file_props(std::string const&  elf_file, std::ifstream&
 
 std::string  load_elf(std::string const& elf_file, load_props_elf&  load_props)
 {
-    ASSUMPTION( file_exists(elf_file) );
+    ASSUMPTION( fileutl::file_exists(elf_file) );
     ASSUMPTION( load_props.files_table()->count(elf_file) == 0U );
 
     std::ifstream  elf{elf_file,std::ifstream::binary};

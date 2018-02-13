@@ -1,8 +1,8 @@
 #include <rebours/MAL/loader/dump.hpp>
 #include <rebours/MAL/loader/special_sections/elf_tls.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
-#include <rebours/MAL/loader/invariants.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/assumptions.hpp>
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -242,8 +242,8 @@ void  dump_html_per_section_relocations(std::string const&  output_file_pathname
                  << std::hex << ptr->end_address() << ".html";
 
         std::string const  output_section_file_pathname =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         filename.str()
                         );
 
@@ -358,8 +358,8 @@ void  dump_html_per_section_skipped_relocations(std::string const&  output_file_
                  << std::hex << ptr->end_address() << ".html";
 
         std::string const  output_section_file_pathname =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         filename.str()
                         );
 
@@ -470,8 +470,8 @@ void  dump_html_contents_of_sections(std::string const&  output_file_pathname, d
                  << std::hex << ptr->end_address() << ".html";
 
         std::string const  output_section_file_pathname =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         filename.str()
                         );
 
@@ -1085,9 +1085,9 @@ void  dump_dot(dependencies_graph_ptr const graph, std::string const&  output_fi
 void  dump_html(descriptor_ptr const  data, std::string const&  output_file_pathname,
                 std::vector<address> const&  start_addresses_of_sections_whose_content_should_be_dumped)
 {
-    ASSUMPTION(!is_directory(output_file_pathname));
+    ASSUMPTION(!fileutl::is_directory(output_file_pathname));
 
-    create_directory(parse_path_in_pathname(output_file_pathname));
+    fileutl::create_directory(fileutl::parse_path_in_pathname(output_file_pathname));
 
     std::ofstream  ostr{output_file_pathname,std::ofstream::binary};
 
@@ -1202,8 +1202,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
         {
             std::string  output_name;
             {
-                std::string  tmp{ parse_name_in_pathname(fprops->path()) +
-                                  parse_path_in_pathname(fprops->path()) };
+                std::string  tmp{ fileutl::parse_name_in_pathname(fprops->path()) +
+                                  fileutl::parse_path_in_pathname(fprops->path()) };
                 std::replace(tmp.begin(),tmp.end(),'/','_');
                 std::replace(tmp.begin(),tmp.end(),'.','_');
                 output_name = std::string{"./warnings_"} + tmp + ".html";
@@ -1213,8 +1213,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
                  << "</a>";
 
             std::string const  output_pathname =
-                    concatenate_file_paths(
-                            parse_path_in_pathname(output_file_pathname),
+                    fileutl::concatenate_file_paths(
+                            fileutl::parse_path_in_pathname(output_file_pathname),
                             output_name
                             );
             std::ofstream  ostr{output_pathname,std::ofstream::binary};
@@ -1259,7 +1259,7 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
         std::string const  dot_file = output_file_pathname + ".dep_loaded.dot";
         std::string const  extension = "svg";
         std::string const  img_file = output_file_pathname + ".dep_loaded." + extension;
-        std::string const  filename = parse_name_in_pathname(output_file_pathname) + ".dep_loaded." + extension;
+        std::string const  filename = fileutl::parse_name_in_pathname(output_file_pathname) + ".dep_loaded." + extension;
         std::string const  command = std::string("dot -T") + extension + " \"" + dot_file + "\" -o \"" + img_file + "\"";
         dump_dot(data->dependencies_of_loaded_files(),dot_file);
         auto ignore = std::system(command.c_str());
@@ -1277,7 +1277,7 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
             std::string const  dot_file = output_file_pathname + ".dep_all.dot";
             std::string const  extension = "svg";
             std::string const  img_file = output_file_pathname + ".dep_all." + extension;
-            std::string const  filename = parse_name_in_pathname(output_file_pathname) + ".dep_all." + extension;
+            std::string const  filename = fileutl::parse_name_in_pathname(output_file_pathname) + ".dep_all." + extension;
             std::string const  command = std::string("dot -T") + extension + " \"" + dot_file + "\" -o \"" + img_file + "\"";
             dump_dot(data->dependencies_of_all_files(),dot_file);
             auto ignore = std::system(command.c_str());
@@ -1356,8 +1356,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
         ostr << " The complete list can be found\n";
         ostr << "<a href=\"./relocations_performed.html\">here</a>.";
         std::string const  output_pathname =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         "relocations_performed.html"
                         );
         std::ofstream  ostr{output_pathname,std::ofstream::binary};
@@ -1373,8 +1373,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
                 " which was not loaded. The complete list can be found\n";
         ostr << "<a href=\"./relocations_skipped.html\">here</a>.";
         std::string const  output_pathname =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         "relocations_skipped.html"
                         );
         std::ofstream  ostr{output_pathname,std::ofstream::binary};
@@ -1384,14 +1384,14 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
     ostr << "</p>\n";
     ostr << "<p>\n";
     ostr << "Note that we also present relocations (both performed and skipped) per section basis\n"
-            "<a href=\"./" << parse_name_in_pathname(output_file_pathname) << "#sections_list\">below</a>.";
+            "<a href=\"./" << fileutl::parse_name_in_pathname(output_file_pathname) << "#sections_list\">below</a>.";
     ostr << "</p>\n";
 
     if (data->visible_symbol_table().operator bool() && !data->visible_symbol_table()->empty())
     {
         std::string const  filename =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         "visible_symbol_table.html"
                         );
         dump_symbol_table(*data->visible_symbol_table(),filename);
@@ -1404,8 +1404,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
     if (data->hidden_symbol_table().operator bool() && !data->hidden_symbol_table()->empty())
     {
         std::string const  filename =
-                concatenate_file_paths(
-                        parse_path_in_pathname(output_file_pathname),
+                fileutl::concatenate_file_paths(
+                        fileutl::parse_path_in_pathname(output_file_pathname),
                         "hidden_symbol_table.html"
                         );
         dump_symbol_table(*data->hidden_symbol_table(),filename);
@@ -1607,8 +1607,8 @@ void  dump_html(descriptor_ptr const  data, std::string const&  output_file_path
                     details_filename = filename.str();
 
                     std::string const  output_section_file_pathname =
-                            concatenate_file_paths(
-                                    parse_path_in_pathname(output_file_pathname),
+                            fileutl::concatenate_file_paths(
+                                    fileutl::parse_path_in_pathname(output_file_pathname),
                                     details_filename
                                     );
 

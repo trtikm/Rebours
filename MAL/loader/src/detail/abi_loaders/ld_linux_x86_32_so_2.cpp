@@ -1,5 +1,5 @@
 #include <rebours/MAL/loader/detail/abi_loaders.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
+#include <rebours/utility/assumptions.hpp>
 #include <unordered_map>
 #include <iostream>
 
@@ -86,7 +86,7 @@ std::string  perform_relocations(
                                                        description_base + ": " + error_message});
                     break;
                 }
-                error_message = write_uint32_t(relocation_address,symbol_address,load_props.sections_table());
+                error_message = write_uint32_t(relocation_address,(uint32_t)symbol_address,load_props.sections_table());
                 if (!error_message.empty())
                 {
                     load_props.add_skipped_relocation({relocation_address,sizeof(uint32_t),symbol_type,0ULL,0ULL,symbol_id,
@@ -99,7 +99,7 @@ std::string  perform_relocations(
             break;
         case  8U: //    R_386_RELATIVE     8   word32   B + A            (i.e. Adjust by program base)
             {
-                std::string  error_message = write_uint32_t(relocation_address,base_address + addend,
+                std::string  error_message = write_uint32_t(relocation_address,(uint32_t)(base_address + addend),
                                                             load_props.sections_table());
                 if (!error_message.empty())
                 {

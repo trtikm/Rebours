@@ -1,5 +1,5 @@
 #include <rebours/MAL/loader/file_props.hpp>
-#include <rebours/MAL/loader/assumptions.hpp>
+#include <rebours/utility/assumptions.hpp>
 
 namespace loader { namespace format {
 

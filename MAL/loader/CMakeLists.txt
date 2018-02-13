@@ -59,6 +59,18 @@ include_directories(
     )
 
 
+find_package(Threads)
+
+
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
 add_library(loader
     ./include/rebours/MAL/loader/address.hpp
 
@@ -87,12 +99,6 @@ add_library(loader
     ./include/rebours/MAL/loader/descriptor.hpp
     ./src/descriptor.cpp
 
-    ./include/rebours/MAL/loader/assumptions.hpp
-    ./include/rebours/MAL/loader/invariants.hpp
-    ./include/rebours/MAL/loader/endian.hpp
-
-    ./include/rebours/MAL/loader/msgstream.hpp
-
     ./include/rebours/MAL/loader/dependencies_graph.hpp
     ./src/dependencies_graph.cpp
 
@@ -102,14 +108,6 @@ add_library(loader
     ./src/relocations.cpp
 
     ./include/rebours/MAL/loader/warnings.hpp
-
-    ./include/rebours/MAL/loader/buffer_io.hpp
-    ./src/buffer_io.cpp
-
-    ./include/rebours/MAL/loader/to_string.hpp
-
-    ./include/rebours/MAL/loader/file_utils.hpp
-    ./src/file_utils.cpp
 
     ./include/rebours/MAL/loader/dump.hpp
     ./src/dump.cpp
