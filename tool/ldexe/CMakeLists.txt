@@ -22,14 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
@@ -65,8 +66,52 @@ if(NOT DEFINED LOADER_ROOT)
 endif()
 set(LOADER_INCLUDE_DIR "${LOADER_ROOT}/include")
 include_directories(${LOADER_INCLUDE_DIR})
-if(NOT DEFINED REBOURS_GLOBAL_BUILD)
-    add_subdirectory("${LOADER_ROOT}"  "loader")
+link_directories(
+    "${LOADER_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib/MAL"
+    )
+
+
+set(REBOURS_UTILITY_ROOT "${PROJECT_SOURCE_DIR}/../../utility" CACHE STRING "Specify path to the 'utility' library of Rebours." FORCE)
+include_directories(
+    "${REBOURS_UTILITY_ROOT}/include"
+    )
+link_directories(
+    "${REBOURS_UTILITY_ROOT}/bin/${CMAKE_SYSTEM_NAME}_${CMAKE_BUILD_TYPE}/lib"
+    )
+
+
+# find and add Boost
+message("Searching for Boost library ...")
+if(NOT DEFINED BOOST_INSTALL_DIR)
+    set(BOOST_INSTALL_DIR "Specify boost's installation directory." CACHE STRING "Specify boost's installation directory." FORCE)
+endif()
+if(EXISTS "${BOOST_INSTALL_DIR}" AND IS_DIRECTORY "${BOOST_INSTALL_DIR}")
+    set(BOOST_ROOT ${BOOST_INSTALL_DIR})
+endif()
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS
+                system
+                thread
+                chrono
+                log_setup
+                log
+                filesystem
+                program_options
+             REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
+add_definitions("-DBOOST_LOG_SETUP")
+set(BOOST_LIST_OF_LIBRARIES_TO_LINK_WITH
+        ${Boost_LIBRARIES}
+    )
+if(DEFINED BOOST_ROOT)
+    message("Boost was found in directory: " ${BOOST_ROOT})
+    message("Boost includes were found in directory: " ${Boost_INCLUDE_DIRS})
+    message("Boost libraries were found in directory: " ${Boost_LIBRARY_DIRS})
+else()
+    message(SEND_ERROR "The installation directory of Boost was not FOUND!")
 endif()
 
 
@@ -74,16 +119,11 @@ find_package(Threads)
 
 
 add_executable(ldexe
-    ./include/ldexe/assumptions.hpp
-    ./include/ldexe/invariants.hpp
-    ./include/ldexe/endian.hpp
-    ./include/ldexe/msgstream.hpp
-    ./include/ldexe/test.hpp
-
     ./src/ldexe.cpp
     )
 
 target_link_libraries(ldexe
+    utility
     loader
     )
 

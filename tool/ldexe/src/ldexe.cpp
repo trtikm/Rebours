@@ -1,8 +1,8 @@
-#include <ldexe/assumptions.hpp>
-#include <ldexe/invariants.hpp>
 #include <rebours/MAL/loader/load.hpp>
 #include <rebours/MAL/loader/dump.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
+#include <rebours/utility/file_utils.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
 #include <string>
 #include <map>
 #include <set>
@@ -46,7 +46,7 @@ static void load_and_dump_binary(std::string const&  file_pathname,
                                  std::string const&  output_dir)
 {
     std::cout << "Loading: "
-              << (file_exists(file_pathname) ? absolute_path(file_pathname) : file_pathname)
+              << (fileutl::file_exists(file_pathname) ? fileutl::absolute_path(file_pathname) : file_pathname)
               << "\n";
     std::string  error_message;
     loader::descriptor_ptr const  bfile_descriptor =
@@ -61,10 +61,15 @@ static void load_and_dump_binary(std::string const&  file_pathname,
         INVARIANT(bfile_descriptor.operator bool());
         INVARIANT(error_message.empty());
 
-        create_directory(output_dir);
-        std::string const  full_output_dir = absolute_path(output_dir);
+        fileutl::create_directory(output_dir);
+        std::string const  full_output_dir = fileutl::absolute_path(output_dir);
         std::string const  dump_file =
-                normalise_path(concatenate_file_paths(full_output_dir,parse_name_in_pathname(file_pathname) + ".html"));
+                fileutl::normalise_path(
+                    fileutl::concatenate_file_paths(
+                        full_output_dir,
+                        fileutl::parse_name_in_pathname(file_pathname) + ".html"
+                        )
+                    );
         std::cout << "Dumping: " << dump_file << "\n";
         loader::dump_html(
                 bfile_descriptor,
@@ -152,12 +157,12 @@ int main(int argc, char* argv[])
         }
         if (args.count(KWD_DUMP_TO) == 0ULL)
         {
-            std::string  common_preffix = parse_path_in_pathname(args.at(KWD_BINARY).front());
+            std::string  common_preffix = fileutl::parse_path_in_pathname(args.at(KWD_BINARY).front());
             for (auto const& pathname : args.at(KWD_BINARY))
-                common_preffix = get_common_preffix(pathname,common_preffix);
+                common_preffix = fileutl::get_common_preffix(pathname,common_preffix);
             for (auto const& pathname : args.at(KWD_BINARY))
                 args[KWD_DUMP_TO].push_back(
-                        concatenate_file_paths("./reload_dump",get_relative_path(pathname,common_preffix)));
+                        fileutl::concatenate_file_paths("./reload_dump",fileutl::get_relative_path(pathname,common_preffix)));
         }
         if (args.at(KWD_DUMP_TO).size() != args.at(KWD_BINARY).size())
         {
@@ -174,7 +179,7 @@ int main(int argc, char* argv[])
                     args.at(KWD_BINARY).at(i),
                     args.at(KWD_IGNORE),
                     args.count(KWD_SEARCH_IN) == 0ULL ?
-                            std::vector<std::string>{ parse_path_in_pathname(args.at(KWD_BINARY).at(i)) } :
+                            std::vector<std::string>{ fileutl::parse_path_in_pathname(args.at(KWD_BINARY).at(i)) } :
                             args.at(KWD_SEARCH_IN),
                     args.at(KWD_DUMP_TO).at(i)
                     );
