@@ -1,8 +1,8 @@
 #include <natexe/argparser.hpp>
-#include <natexe/assumptions.hpp>
-#include <natexe/invariants.hpp>
-#include <natexe/development.hpp>
-#include <natexe/msgstream.hpp>
+#include <rebours/utility/assumptions.hpp>
+#include <rebours/utility/invariants.hpp>
+#include <rebours/utility/development.hpp>
+#include <rebours/utility/msgstream.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <cstdlib>
@@ -215,7 +215,7 @@ std::string  parse_argument(std::string const&  input, std::string&  kwd, std::v
 bool  is_uint(std::string const&  text)
 {
     for (auto c : text)
-        if (!std::isdigit(c))
+        if (!::isdigit(c))
             return false;
     return true;
 }
