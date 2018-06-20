@@ -22,15 +22,15 @@ endif()
 
 # OS specific settings
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-  message("Operating System = Darwin")
+    set(CMAKE_MACOSX_RPATH ON)
+    message("Operating System = Darwin")
 elseif(UNIX)
-  message("Operating System = Unix")
+    message("Operating System = Unix")
 elseif(WIN32)
-  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-  message("Operating System = MS-Windows")
+    add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+    message("Operating System = MS-Windows")
 else()
-  message(FATAL_ERROR "Unsupported Operating System ! Aborting...
+    message(FATAL_ERROR "Unsupported Operating System ! Aborting...
 (supported OS: MacOS X, Linux, *BSD, MS-Windows)")
 endif()
 
