@@ -1,31 +1,14 @@
-set(THIS_TARGET_NAME natexe)
-
+set(THIS_TARGET_NAME expressions_io)
+set(TESTED_MODULE_NAME bitvectors)
 
 add_executable(${THIS_TARGET_NAME}
-    ./include/natexe/argparser.hpp
-    ./src/argparser.cpp
-
-    ./src/main.cpp
+    main.cpp
     )
-
-
-include_directories("./include")
-
 
 target_link_libraries(${THIS_TARGET_NAME}
-    native_execution
     bitvectors
-    descriptor
-    loader
-    reloader
-    prologue
-    recogniser
-    encoder
-    program
     utility
-    ${CAPSTONE_NEXT_LIBRARIES_TO_LINK_WITH}
     )
-
 
 set_target_properties(${THIS_TARGET_NAME} PROPERTIES
     DEBUG_OUTPUT_NAME "${THIS_TARGET_NAME}_${CMAKE_SYSTEM_NAME}_Debug"
@@ -33,4 +16,4 @@ set_target_properties(${THIS_TARGET_NAME} PROPERTIES
     RELWITHDEBINFO_OUTPUT_NAME "${THIS_TARGET_NAME}_${CMAKE_SYSTEM_NAME}_RelWithDebInfo"
     )
 
-install(TARGETS ${THIS_TARGET_NAME} DESTINATION "bin")
+install(TARGETS ${THIS_TARGET_NAME} DESTINATION "test/${TESTED_MODULE_NAME}")

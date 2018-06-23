@@ -778,6 +778,7 @@ void  dump_html_special_section_load_configuration_structure(
     ostr << "    <td>";
 
     char buffer[64];
+
     ostr << std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::gmtime(&data->timestamp()));
 
     ostr << "</td>\n";

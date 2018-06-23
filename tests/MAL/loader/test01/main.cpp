@@ -2,8 +2,8 @@
 #include "../test.hpp"
 
 #include <rebours/MAL/loader/dump.hpp>
-#include <rebours/MAL/loader/file_utils.hpp>
 #include <rebours/MAL/loader/load.hpp>
+#include <rebours/utility/file_utils.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -30,9 +30,9 @@ void do_test(std::string const&  file_pathname,
         TEST_SUCCESS(bfile_descriptor.operator bool());
         TEST_SUCCESS(error_message.empty());
 
-        create_directory(output_dir);
+        fileutl::create_directory(output_dir);
         std::string const  dump_file =
-                normalise_path(concatenate_file_paths(output_dir,parse_name_in_pathname(file_pathname) + ".html"));
+            fileutl::normalise_path(fileutl::concatenate_file_paths(output_dir, fileutl::parse_name_in_pathname(file_pathname) + ".html"));
         std::cout << "-- dumping results to: " << dump_file << "\n";
         std::cout.flush();
         loader::dump_html(
@@ -58,109 +58,109 @@ int main(int argc, char* argv[])
     try
     {
         do_test(
-            concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64/libMagickWand-6.Q16.2.dylib"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64/libMagickWand-6.Q16.2.dylib"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64")},
             "./test01/ImageMagick_darwin_x86_64/libMagickWand-6.Q16.2.dylib"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64/animate"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64/animate"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"ImageMagick_darwin_x86_64")},
             "./test01/ImageMagick_darwin_x86_64/animate"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_64/loadlibs_Darwin_Release"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_64/loadlibs_Darwin_Release"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_64")},
             "./test01/loadlibs_Darwin_Release (X86_64)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_32/loadlibs_Darwin_Release"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_32/loadlibs_Darwin_Release"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_32")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_macosx_X86_32")},
             "./test01/loadlibs_Darwin_Release (X86_32)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_32/loadlibs_Linux_Release"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_32/loadlibs_Linux_Release"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_32")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_32")},
             "./test01/loadlibs_Linux_Release (X86_32)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_64/loadlibs_Windows_Release.exe"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_64/loadlibs_Windows_Release.exe"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_64")},
             "./test01/loadlibs_Windows_Release.exe (X86_64)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_32/loadlibs_Windows_Release.exe"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_32/loadlibs_Windows_Release.exe"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_32")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_windows_X86_32")},
             "./test01/loadlibs_Windows_Release.exe (X86_32)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_64/69ca9a1113f95f9c08c9031ab4418fbf"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_64/69ca9a1113f95f9c08c9031ab4418fbf"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_64/69ca9a1113f95f9c08c9031ab4418fbf")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_64/69ca9a1113f95f9c08c9031ab4418fbf")},
             "./test01/malwaredb.malekal.com/windows/X86_64/69ca9a1113f95f9c08c9031ab4418fbf"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_32/be0f735eb31f143c9f0fc5a070ea69df"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_32/be0f735eb31f143c9f0fc5a070ea69df"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_32")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"malwaredb.malekal.com/windows/X86_32")},
             "./test01/malwaredb.malekal.com/windows/X86_32/be0f735eb31f143c9f0fc5a070ea69df"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/loadlibs_Linux_Release"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/loadlibs_Linux_Release"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
             "./test01/loadlibs_Linux_Release (X86_64)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/libloadlibs_dynamic_lib_one_Linux_Release.so"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/libloadlibs_dynamic_lib_one_Linux_Release.so"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
             "./test01/libloadlibs_dynamic_lib_one_Linux_Release (X86_64)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/libloadlibs_dynamic_lib_seven_Linux_Release.so"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64/libloadlibs_dynamic_lib_seven_Linux_Release.so"),
             {},
-            {concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
+            {fileutl::concatenate_file_paths(benchmarks_path(),"loadlibs_ubuntu_X86_64")},
             "./test01/libloadlibs_dynamic_lib_seven_Linux_Release (X86_64)"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"crackme_debian_X86_32"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"crackme_debian_X86_32"),
             {},
             {benchmarks_path()},
             "./test01/crackme_debian_X86_32"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"crackme_debian_X86_64"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"crackme_debian_X86_64"),
             {},
             {benchmarks_path()},
             "./test01/crackme_debian_X86_64"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"tiny32-00_debian_X86_32"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"tiny32-00_debian_X86_32"),
             {},
             {benchmarks_path()},
             "./test01/tiny32-00_debian_X86_32"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"tiny32-01_debian_X86_32"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"tiny32-01_debian_X86_32"),
             {},
             {benchmarks_path()},
             "./test01/tiny32-01_debian_X86_32"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"tiny64_debian_X86_64"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"tiny64_debian_X86_64"),
             {},
             {benchmarks_path()},
             "./test01/tiny64_debian_X86_64"
             );
         do_test(
-            concatenate_file_paths(benchmarks_path(),"tiny64-hello_debian_X86_64"),
+            fileutl::concatenate_file_paths(benchmarks_path(),"tiny64-hello_debian_X86_64"),
             {},
             {benchmarks_path()},
             "./test01/tiny64-hello_debian_X86_64"
