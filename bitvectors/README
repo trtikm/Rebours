@@ -1,8 +1,0 @@
-bitvectors
-==========
-
-
-This module implements bitvector expressions. There is included
-simplification and satisfiability checking functionality boosted
-by SMT solvers like Boolector, MathSAT5, and Z3.
-
