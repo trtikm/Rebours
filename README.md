@@ -79,10 +79,11 @@ where we used the following symbols (they must be  substituted by proper values)
 
 Optionally, you can extend the 'cmake' command by these assignments:
 
-    -DINCLUDE_TESTS=$INCLUDE-TESTS -DMATHSAT5_ROOT=$MATHSAT5-ROOT -DBOOLECTOR_ROOT=$BOOLECTOR-ROOT 
+    -DINCLUDE_TESTS=$INCLUDE-TESTS -DINCLUDE_BENCHMARKS=$INCLUDE-BENCHMARKS -DMATHSAT5_ROOT=$MATHSAT5-ROOT -DBOOLECTOR_ROOT=$BOOLECTOR-ROOT 
     
 where we used the following symbols (they must be  substituted by proper values):
     - $INCLUDE-TESTS: Do you want to build tests? Possible values are: yes, no (default is yes).
+    - $INCLUDE-BENCHMARKS: Do you want to build benchmarks? Possible values are: yes, no (default is yes).
     - $MATHSAT5-ROOT:  The install directory of the MATHSAT5 SMT solver.
     - $BOOLECTOR-ROOT: The install directory of the BOOLECTOR SAT solver.
 
@@ -129,10 +130,11 @@ where we used the following symbols (they must be  substituted by proper values)
 
 Optionally, you can extend the 'cmake' command by these assignments:
 
-    -DINCLUDE_TESTS=$INCLUDE-TESTS -DMATHSAT5_ROOT=$MATHSAT5-ROOT -DBOOLECTOR_ROOT=$BOOLECTOR-ROOT 
+    -DINCLUDE_TESTS=$INCLUDE-TESTS -DINCLUDE_BENCHMARKS=$INCLUDE-BENCHMARKS -DMATHSAT5_ROOT=$MATHSAT5-ROOT -DBOOLECTOR_ROOT=$BOOLECTOR-ROOT 
     
 where we used the following symbols (they must be  substituted by proper values):
     - $INCLUDE-TESTS: Do you want to build tests? Possible values are: yes, no (default is yes).
+    - $INCLUDE-BENCHMARKS: Do you want to build benchmarks? Possible values are: yes, no (default is yes).
     - $MATHSAT5-ROOT:  The install directory of the MATHSAT5 SMT solver.
     - $BOOLECTOR-ROOT: The install directory of the BOOLECTOR SAT solver.
 

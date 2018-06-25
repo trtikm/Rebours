@@ -206,9 +206,13 @@ include_directories(
 add_subdirectory(analysis/native_execution)
 
 
-# And include tools to the project.
+# Include tools to the project.
 add_subdirectory(tool/ldexe)
 add_subdirectory(tool/natexe)
+
+
+# Include build and install of data (benchmarks, etc.)
+add_subdirectory(./data)
 
 
 # Include also tests to the build?

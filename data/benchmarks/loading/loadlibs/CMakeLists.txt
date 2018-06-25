@@ -1,0 +1,21 @@
+include_directories(
+    "./"
+    "./static_lib_one/include"
+    "./dynamic_lib_one/include"
+    "./dynamic_lib_two/include"
+    "./dynamic_lib_three/include"
+    "./dynamic_lib_four/include"
+    "./dynamic_lib_five/include"
+    "./dynamic_lib_six/include"
+    "./dynamic_lib_seven/include"
+    )
+
+add_subdirectory(./loadlibs)
+add_subdirectory(./static_lib_one)
+add_subdirectory(./dynamic_lib_one)
+add_subdirectory(./dynamic_lib_two)
+add_subdirectory(./dynamic_lib_three)
+add_subdirectory(./dynamic_lib_four)
+add_subdirectory(./dynamic_lib_five)
+add_subdirectory(./dynamic_lib_six)
+add_subdirectory(./dynamic_lib_seven)

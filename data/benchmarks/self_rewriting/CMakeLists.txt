@@ -1,0 +1,6 @@
+add_subdirectory(./inc_constant_in_mov)
+add_subdirectory(./inc_constant_in_mov_2)
+add_subdirectory(./move_block_of_code)
+add_subdirectory(./permute_instructions)
+add_subdirectory(./swap_tiny)
+add_subdirectory(./where_was_i_A)
